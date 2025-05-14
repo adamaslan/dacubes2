@@ -1,7 +1,8 @@
 // routes/_index.tsx
-import React from "react";
+import React, { Suspense} from "react";
 import Navbar from "~/components/navbar";
 import type { MetaFunction } from "@remix-run/node";
+
 import DaCubes4 from "~/components/three4";
 
 export const meta: MetaFunction = () => {
@@ -38,12 +39,15 @@ export default function Index() {
         <h2>Click on the cubes!</h2>
       </div>
 
-      <DaCubes4 
-        cubes={customCubes}
-        textSize={0.8}
-        engraveDepth={0.3}
-        fontUrl="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/fonts/helvetiker_regular.typeface.json"
-      />
+      <Suspense fallback={<div className="text-white text-center">Loading 3D navigation...</div>}>
+        <DaCubes4 
+          cubes={customCubes}
+          textSize={0.8}
+          engraveDepth={0.3}
+          fontUrl="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/fonts/helvetiker_regular.typeface.json"
+        />
+      </Suspense>
+      
     </div>
   );
 }

@@ -1,7 +1,11 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  content: ["./app/**/*.{js,jsx,ts,tsx}"],
+  // Update content array to include all template paths
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./app/**/*.css",  // Add this line
+    "./app/**/{**,.client,.server}/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       fontFamily: {
