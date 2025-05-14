@@ -6,8 +6,8 @@ import DaCubes4 from "~/components/three4";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "3D Cubes Experience" },
-    { name: "description", content: "Interactive 3D cubes navigation" },
+    { title: "Adam Aslan Portfolio" },
+    { name: "description", content: "Adam Aslan's Portfolio with interactive 3D cubes for navigation to other pages" },
   ];
 };
 
@@ -33,8 +33,9 @@ export default function Index() {
       
       <div className="relative z-10 pt-24 text-center">
         <h1 className="text-4xl font-bold text-white mb-8">
-          Interactive 3D Navigation
+        Adam Aslan's Portfolio with interactive 3D cubes for navigation to other pages
         </h1>
+        <h2>Click on the cubes!</h2>
       </div>
 
       <DaCubes4 
