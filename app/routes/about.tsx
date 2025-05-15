@@ -6,15 +6,17 @@ import Navbar from "~/components/navbar";
 // Use direct path in links function instead
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "/styles/about.css" },
+  // If Navbar.tsx imports its own CSS (which it does: import '../styles/navbar.css';),
+  // then navbar.css is handled, and no further action is needed here for it.
 ];
 
 // Make sure navbar.css is also handled, either imported in Navbar.tsx or globally if preferred
-
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: aboutStylesHref },
-  // If Navbar.tsx doesn't import its own CSS and you want it route-specific:
-  // { rel: "stylesheet", href: navbarStylesHref }, // (you'd need to import navbarStylesHref too)
-];
+// REMOVED DUPLICATE LINKS FUNCTION THAT WAS HERE:
+// export const links: LinksFunction = () => [
+//   { rel: "stylesheet", href: aboutStylesHref },
+//   // If Navbar.tsx doesn't import its own CSS and you want it route-specific:
+//   // { rel: "stylesheet", href: navbarStylesHref }, // (you'd need to import navbarStylesHref too)
+// ];
 
 export const meta: MetaFunction = () => {
   return [
