@@ -1,0 +1,36 @@
+/* /Users/adamaslan/code/dacubes2/app/styles/about.css */
+.about-page-container {
+  /* If you need specific styles for the overall page container, add them here */
+  /* For example, to ensure Navbar doesn't overlap content if it's not fixed, add padding-top */
+  /* padding-top: 70px; /* Adjust based on Navbar height */
+}
+
+.about-grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* grid-cols-2 */
+  gap: 1rem; /* gap-4 (16px) */
+  padding: 1rem; /* p-4 (16px) */
+}
+
+.about-grid-item {
+  padding: 2rem; /* p-8 (32px) */
+  text-align: center;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white; /* text-white */
+  font-weight: 700; /* font-bold */
+  /* background-color will be applied via inline styles as before */
+}
+
+@media (min-width: 768px) { /* md: */
+  .about-grid-container {
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* md:grid-cols-3 */
+    /* md:grid-rows-3 is more complex if content heights vary.
+       If explicit row count is needed and items should stretch,
+       you might need to set a height on the grid container or use fr units for rows.
+       For now, this matches the column behavior. If items should fill fixed rows:
+       grid-template-rows: repeat(3, minmax(150px, auto)); /* Example for 3 rows */
+  }
+}

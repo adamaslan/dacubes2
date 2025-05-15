@@ -1,0 +1,5 @@
+/* ... existing code ... */
+textarea {
+  letter-spacing: 0.01em; /* Add unit (em) to the value */
+}
+/* ... existing code ... */

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/navbar.css'; // Import the new CSS file
 
 interface NavbarProps {
   links: { href: string; text: string }[];
@@ -9,41 +10,48 @@ const Navbar: React.FC<NavbarProps> = ({ links, logo }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
+    const updateScrollState = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    let ticking = false;
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateScrollState();
+          ticking = false;
+        });
+        ticking = true;
       }
     };
-
+    updateScrollState();
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navClasses = `navbar ${isScrolled ? 'navbar-scrolled' : 'navbar-transparent'}`;
+
   return (
-    <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/70 backdrop-blur-md shadow-md'
-          : 'bg-transparent'
-      } py-4 px-8 md:px-16 flex justify-between items-center`}
-    >
-      {logo && logo}
-      <ul className="flex m-0 p-0 list-none">
-        {links.map((link) => (
-          <li key={link.href} className="ml-8 md:ml-16">
-            <a
-              href={link.href}
-              className="text-gray-800 font-medium hover:text-blue-500 transition-colors duration-300"
-            >
-              {link.text}
-            </a>
-          </li>
-        ))}
-      </ul>
+    <nav className={navClasses}>
+      <div className="navbar-container">
+        {logo && React.cloneElement(logo, { 
+          // Remove Tailwind classes that are now handled by navbar.css for the logo
+          className: `${(logo.props.className || '')
+            .replace(/\btext-\S+\b/g, '') // Remove text color utilities
+            .replace(/\bfont-(bold|medium|semibold)\b/g, '') // Remove font weight utilities
+            .trim()} navbar-logo`
+        })}
+        
+        <ul className="navbar-links-list">
+          {links.map((link) => (
+            <li key={link.href} className="navbar-link-item">
+              <a href={link.href}>
+                {link.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 };
