@@ -6,21 +6,16 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
-// Existing import looks correct but ensure it's processed:
-import "./tailwind.css";
 
+// import tailwindStylesheetUrl from "./tailwind.css"; // REMOVE THIS
+import globalStylesHref from "./styles/global.css"; // ADD THIS
 
 export const links: LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
+  // { rel: "stylesheet", href: tailwindStylesheetUrl }, // REMOVE THIS
+  { rel: "stylesheet", href: globalStylesHref },   // ADD THIS
+  // You might also want to link fonts here if not done in global.css
+  // e.g., { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" }
+  // from your contact.css
 ];
 
 export default function App() {
@@ -32,7 +27,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-white dark:bg-gray-950">
+      <body>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

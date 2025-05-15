@@ -42,6 +42,7 @@ export default function About() {
         >
           + - + - + - + - + - + - + - + -
         </div>
+        {/* ... other grid items ... (remove Tailwind classes, use about-grid-item) */}
         <div
           className="about-grid-item"
           style={{ backgroundColor: '#45B7D1' }}
