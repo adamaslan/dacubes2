@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/navbar.css'; // Import the new CSS file
 
 interface NavbarProps {
   links: { href: string; text: string }[];
@@ -14,7 +15,6 @@ const Navbar: React.FC<NavbarProps> = ({ links, logo }) => {
     };
 
     let ticking = false;
-
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
@@ -24,40 +24,28 @@ const Navbar: React.FC<NavbarProps> = ({ links, logo }) => {
         ticking = true;
       }
     };
-
-    // Set initial state on mount
     updateScrollState();
-
     window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      // requestAnimationFrame handles its own cleanup if the callback isn't executed.
-    };
-  }, []); // Empty dependency array is appropriate here as setIsScrolled is stable.
+  const navClasses = `navbar ${isScrolled ? 'navbar-scrolled' : 'navbar-transparent'}`;
 
   return (
-    <nav
-      className={`fixed top-0 w-full z-50 transition-[opacity,backdrop-filter] duration-300 ${
-        isScrolled
-          ? 'bg-white/80 backdrop-blur-md shadow-sm'
-          : 'bg-transparent'
-      } py-3 px-4 sm:px-8 md:px-12`}
-    >
-      <div className="max-w-screen-xl mx-auto flex items-center justify-between">
+    <nav className={navClasses}>
+      <div className="navbar-container">
         {logo && React.cloneElement(logo, { 
-          className: `${logo.props.className || ''} h-8 w-auto transition-transform hover:scale-105`
+          // Remove Tailwind classes that are now handled by navbar.css for the logo
+          className: `${(logo.props.className || '')
+            .replace(/\btext-\S+\b/g, '') // Remove text color utilities
+            .replace(/\bfont-(bold|medium|semibold)\b/g, '') // Remove font weight utilities
+            .trim()} navbar-logo`
         })}
         
-        <ul className="flex space-x-4 md:space-x-6">
+        <ul className="navbar-links-list">
           {links.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                className="text-gray-700 hover:text-blue-600 font-medium transition-all
-                           duration-300 hover:scale-[1.02] active:scale-95 px-2 py-1 rounded-lg
-                           focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-              >
+            <li key={link.href} className="navbar-link-item">
+              <a href={link.href}>
                 {link.text}
               </a>
             </li>
