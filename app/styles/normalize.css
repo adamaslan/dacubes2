@@ -1,0 +1,6 @@
+/* ... existing code ... */
+html {
+  -webkit-text-size-adjust: 100%; /* Change to percentage value */
+  text-size-adjust: 100%;
+}
+/* ... existing code ... */
