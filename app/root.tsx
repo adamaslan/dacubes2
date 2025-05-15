@@ -7,12 +7,12 @@ import {
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 
-// import tailwindStylesheetUrl from "./tailwind.css"; // REMOVE THIS
-import globalStylesHref from "./styles/global.css"; // ADD THIS
+// Don't import CSS files with 'import ... from' syntax
+// import globalStylesHref from "./styles/global.css"; // This is wrong
 
+// CSS files should be referenced in the links function
 export const links: LinksFunction = () => [
-  // { rel: "stylesheet", href: tailwindStylesheetUrl }, // REMOVE THIS
-  { rel: "stylesheet", href: globalStylesHref },   // ADD THIS
+  { rel: "stylesheet", href: "/styles/global.css" },
   // You might also want to link fonts here if not done in global.css
   // e.g., { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" }
   // from your contact.css
