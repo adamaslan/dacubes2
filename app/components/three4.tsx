@@ -186,13 +186,14 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
       for (const data of cubes) {
         const group = await createShapeObject(data);
         
-        // Position randomly in a spherical pattern
+        // Position randomly in a spherical pattern, but restrict Z so cubes don't go deep into the background
         const radius = 10 + Math.random() * 10;
         const angle = Math.random() * Math.PI * 2;
+        const zMax = 8; // maximum distance into background
         group.position.set(
           Math.cos(angle) * radius,
           Math.random() * 8 - 4,
-          Math.sin(angle) * radius
+          Math.max(-zMax, Math.min(zMax, Math.sin(angle) * radius)) // clamp Z
         );
 
         group.userData = { path: data.link };
