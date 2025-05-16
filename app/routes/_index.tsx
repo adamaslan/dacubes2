@@ -1,9 +1,11 @@
 // routes/_index.tsx
 import React, { Suspense} from "react";
 import Navbar from "~/components/navbar";
-import type { MetaFunction } from "@remix-run/node";
+import type {  MetaFunction } from "@remix-run/node";
 
 import DaCubes4 from "~/components/three4";
+import "../styles/index-route.css";
+
 
 export const meta: MetaFunction = () => {
   return [
@@ -22,24 +24,25 @@ export default function Index() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="page-container"> {/* Changed from Tailwind classes */}
       <Navbar 
         links={[
           { href: "/", text: "Home" },
           { href: "/about", text: "About" },
           { href: "/contact", text: "Contact" }
         ]} 
-        logo={<div className="text-white font-bold">LOGO</div>}
+        logo={<div className="navbar-logo-text">Adam's Portfolio</div>} 
       />
       
-      <div className="relative z-10 pt-24 text-center">
-        <h1 className="text-4xl font-bold text-white mb-8">
-        Adam Aslan's Portfolio with interactive 3D cubes for navigation to other pages
+      <div className="header-content"> {/* Changed from Tailwind classes */}
+        <h1 className="main-title"> {/* Changed from Tailwind classes */}
+        
+        Interactive 3D cubes for navigation to other pages
         </h1>
-        <h2>Click on the cubes!</h2>
+        <h2 className="subtitle">Click on the cubes!</h2> {/* Added subtitle class */}
       </div>
 
-      <Suspense fallback={<div className="text-white text-center">Loading 3D navigation...</div>}>
+      <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> {/* Changed from Tailwind classes */}
         <DaCubes4 
           cubes={customCubes}
           textSize={0.8}
