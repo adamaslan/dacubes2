@@ -24,6 +24,10 @@
   color: #ffffff;
   margin-bottom: 2rem; /* Equivalent to Tailwind's mb-8 */
 }
+/* Add this to your index-route.css file */
+.navbar-logo-text, .main-title, .subtitle {
+  font-family: 'Permanent Marker', cursive;
+}
 
 .subtitle {
   color: #ffffff;
