@@ -149,7 +149,7 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
     // Object movement and animation function
     const setupCuteMovement = (object: THREE.Object3D) => {
       const initialPosition = object.position.clone();
-      const speed = (0.2 + Math.random() * 0.3) * 1.2; // 20% faster
+      const speed = (0.2 + Math.random() * 0.3) * 2; // 20% faster
       const angleOffset = Math.random() * Math.PI * 2;
       const orbitRadius = 3.5; // distance from cube center
 
@@ -183,19 +183,45 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
     const cubeUpdaters: (() => void)[] = [];
 
     const loadObjects = async () => {
+      const positions: THREE.Vector3[] = []; // Track existing positions
+      const minDistance = 6; // Minimum distance between cube centers (adjust based on cube size)
+      
       for (const data of cubes) {
         const group = await createShapeObject(data);
         
-        // Position randomly in a spherical pattern, but restrict Z so cubes don't go deep into the background
-        const radius = 10 + Math.random() * 10;
-        const angle = Math.random() * Math.PI * 2;
-        const zMax = 2; // reduced maximum distance into background by 50%
-        group.position.set(
-          Math.cos(angle) * radius,
-          Math.random() * 8 - 4,
-          Math.max(-zMax, Math.min(zMax, Math.sin(angle) * radius)) // clamp Z
-        );
-
+        // Try to find a position that's far enough from existing cubes
+        let attempts = 0;
+        let validPosition = false;
+        let newPosition = new THREE.Vector3();
+        
+        while (!validPosition && attempts < 50) {
+          // Position randomly in a spherical pattern, but restrict Z
+          const radius = 10 + Math.random() * 10;
+          const angle = Math.random() * Math.PI * 2;
+          const zMax = 2;
+          
+          newPosition.set(
+            Math.cos(angle) * radius,
+            Math.random() * 8 - 4,
+            Math.max(-zMax, Math.min(zMax, Math.sin(angle) * radius))
+          );
+          
+          // Check distance from all existing positions
+          validPosition = true;
+          for (const pos of positions) {
+            if (newPosition.distanceTo(pos) < minDistance) {
+              validPosition = false;
+              break;
+            }
+          }
+          
+          attempts++;
+        }
+        
+        // Set the position and track it
+        group.position.copy(newPosition);
+        positions.push(newPosition.clone());
+        
         group.userData = { path: data.link };
         scene.add(group);
         cubeUpdaters.push(setupCuteMovement(group));
