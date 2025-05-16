@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useNavigate } from '@remix-run/react';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; // Added .js extension
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'; // Added .js extension
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'; // Added explicit import
-import "../styles/global.css"
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 // ==================== 1. TYPES AND INTERFACES ====================
 type CubeData = {
   name: string;
@@ -13,19 +11,13 @@ type CubeData = {
 };
 
 type DaCubes4Props = {
-  fontUrl?: string;
   cubes?: CubeData[];
-  engraveDepth?: number;
-  textSize?: number;
   movementIntensity?: number;
 };
 
 // ==================== 2. COMPONENT DEFINITION ====================
 const DaCubes4: React.FC<DaCubes4Props> = ({
-  fontUrl = 'https://cdn.jsdelivr.net/npm/three/examples/fonts/gentilis_regular.typeface.json',
   cubes = [],
-  engraveDepth = 0.3,
-  textSize = 0.6,
   movementIntensity = 0.5
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -70,20 +62,41 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
     directionalLight.castShadow = true;
     scene.add(directionalLight);
 
-    // Create text geometry helper function
-    const createTextGeometry = (font: any, text: string) => {
-      return new TextGeometry(text, {
-        font: font,
-        size: textSize,
-        depth: engraveDepth,
-        curveSegments: 4,
-      });
+    // Create text using sprite instead of geometry
+    const createTextSprite = (text: string) => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return null;
+      
+      // Set canvas dimensions
+      canvas.width = 256;
+      canvas.height = 128;
+      
+      // Draw background (transparent)
+      context.fillStyle = 'rgba(0,0,0,0)';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Text styling
+      context.font = 'Bold 36px Arial';
+      context.textAlign = 'center';
+      context.fillStyle = 'black'; // Changed from 'white' to 'black'
+      context.fillText(text, canvas.width / 2, canvas.height / 2);
+      
+      // Create texture and sprite
+      const texture = new THREE.CanvasTexture(canvas);
+      const material = new THREE.SpriteMaterial({ map: texture });
+      const sprite = new THREE.Sprite(material);
+      sprite.scale.set(5, 2.5, 1);
+      
+      return sprite;
     };
 
     // Create shape object with text
-    const createShapeObject = async (data: CubeData, font: any) => {
+    const createShapeObject = async (data: CubeData) => {
       const group = new THREE.Group();
       let mainMesh: THREE.Object3D;
+      let textSprite: THREE.Sprite | null = null;
+      let textOrbitAngle = Math.random() * Math.PI * 2; // randomize initial angle
 
       if (data.modelUrl) {
         try {
@@ -120,27 +133,29 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
       }
 
       // Add text label
-      const textGeo = createTextGeometry(font, data.name);
-      const textMesh = new THREE.Mesh(
-        textGeo,
-        new THREE.MeshStandardMaterial({ color: 0xffffff })
-      );
-      textMesh.position.z = 3.5;
+      textSprite = createTextSprite(data.name);
+      if (textSprite) {
+        textSprite.position.z = 3.5;
+        group.add(textSprite);
+        // Store reference for orbit animation
+        (group as any).textSprite = textSprite;
+        (group as any).textOrbitAngle = textOrbitAngle;
+      }
 
       group.add(mainMesh);
-      group.add(textMesh);
       return group;
     };
 
     // Object movement and animation function
     const setupCuteMovement = (object: THREE.Object3D) => {
       const initialPosition = object.position.clone();
-      const speed = 0.2 + Math.random() * 0.3;
+      const speed = (0.2 + Math.random() * 0.3) * 2; // 20% faster
       const angleOffset = Math.random() * Math.PI * 2;
+      const orbitRadius = 3.5; // distance from cube center
 
       return () => {
         const time = clock.current.getElapsedTime() * speed;
-        
+
         // Bouncy floating animation
         object.position.y = initialPosition.y + Math.sin(time + angleOffset) * 1.5;
         object.rotation.x = Math.sin(time * 0.5) * 0.5;
@@ -149,46 +164,76 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
 
         // Gentle scale pulsation
         object.scale.setScalar(1 + Math.sin(time * 2) * 0.05 * movementIntensity);
+
+        // Orbit text sprite around the cube
+        const group = object as any;
+        if (group.textSprite) {
+          // Update the orbit angle
+          group.textOrbitAngle += 0.01; // adjust speed as desired
+          const angle = group.textOrbitAngle;
+          group.textSprite.position.x = Math.cos(angle) * orbitRadius;
+          group.textSprite.position.z = Math.sin(angle) * orbitRadius;
+          group.textSprite.position.y = 0.5 * Math.sin(angle * 2); // optional: add some vertical movement
+          group.textSprite.lookAt(0, 0, 0); // make text always face the camera (optional)
+        }
       };
     };
 
-    // Load fonts and create objects
-    const fontLoader = new FontLoader();
+    // Create objects directly (no font loader needed)
     const cubeUpdaters: (() => void)[] = [];
 
-    fontLoader.load(
-      fontUrl, 
-      // On success
-      async (font) => {
-        for (const data of cubes) {
-          const group = await createShapeObject(data, font);
-          
-          // Position randomly in a spherical pattern
+    const loadObjects = async () => {
+      const positions: THREE.Vector3[] = []; // Track existing positions
+      const minDistance = 6; // Minimum distance between cube centers (adjust based on cube size)
+      
+      for (const data of cubes) {
+        const group = await createShapeObject(data);
+        
+        // Try to find a position that's far enough from existing cubes
+        let attempts = 0;
+        let validPosition = false;
+        let newPosition = new THREE.Vector3();
+        
+        while (!validPosition && attempts < 50) {
+          // Position randomly in a spherical pattern, but restrict Z
           const radius = 10 + Math.random() * 10;
           const angle = Math.random() * Math.PI * 2;
-          group.position.set(
+          const zMax = 2;
+          
+          newPosition.set(
             Math.cos(angle) * radius,
             Math.random() * 8 - 4,
-            Math.sin(angle) * radius
+            Math.max(-zMax, Math.min(zMax, Math.sin(angle) * radius))
           );
-
-          group.userData = { path: data.link };
-          scene.add(group);
-          cubeUpdaters.push(setupCuteMovement(group));
+          
+          // Check distance from all existing positions
+          validPosition = true;
+          for (const pos of positions) {
+            if (newPosition.distanceTo(pos) < minDistance) {
+              validPosition = false;
+              break;
+            }
+          }
+          
+          attempts++;
         }
         
-        setIsLoading(false);
-      },
-      // On progress
-      (xhr) => {
-        console.log(`Font loading: ${(xhr.loaded / xhr.total) * 100}% loaded`);
-      },
-      // On error
-      (error) => {
-        console.error('Font loading failed:', error);
-        setIsLoading(false);
+        // Set the position and track it
+        group.position.copy(newPosition);
+        positions.push(newPosition.clone());
+        
+        group.userData = { path: data.link };
+        scene.add(group);
+        cubeUpdaters.push(setupCuteMovement(group));
       }
-    );
+      
+      setIsLoading(false);
+    };
+    
+    loadObjects().catch(error => {
+      console.error("Failed to load objects:", error);
+      setIsLoading(false);
+    });
 
     // ==================== 4. INTERACTION AND ANIMATION LOOP ====================
     // Click handler for object selection
@@ -277,7 +322,7 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
       // Clear mixers
       mixers.current = [];
     };
-  }, [cubes, engraveDepth, fontUrl, movementIntensity, navigate, textSize]);
+  }, [cubes, movementIntensity, navigate]);
 
   return (
     <div ref={mountRef} className="w-full h-screen">

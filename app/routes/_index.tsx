@@ -31,23 +31,22 @@ export default function Index() {
           { href: "/about", text: "About" },
           { href: "/contact", text: "Contact" }
         ]} 
-        logo={<div className="navbar-logo-text">Adam's Portfolio</div>} 
+        logo={<div className="navbar-logo-text" style={{fontFamily: "'Permanent Marker', cursive"}}>Adam's Portfolio</div>} 
       />
       
       <div className="header-content"> {/* Changed from Tailwind classes */}
-        <h1 className="main-title"> {/* Changed from Tailwind classes */}
-        
+        <h1 className="main-title" style={{fontFamily: "'Permanent Marker', cursive"}}> 
         Interactive 3D cubes for navigation to other pages
         </h1>
-        <h2 className="subtitle">Click on the cubes!</h2> {/* Added subtitle class */}
+        <h2 className="subtitle" style={{fontFamily: "'Permanent Marker', cursive"}}>Click on the cubes!</h2>
       </div>
 
       <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> {/* Changed from Tailwind classes */}
         <DaCubes4 
           cubes={customCubes}
-          textSize={0.8}
-          engraveDepth={0.3}
-          fontUrl="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/fonts/helvetiker_regular.typeface.json"
+          // textSize={0.8} // Removed this line
+          // engraveDepth={0.3}
+          // fontUrl="https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Cfw.json"
         />
       </Suspense>
       
