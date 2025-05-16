@@ -149,7 +149,7 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
     // Object movement and animation function
     const setupCuteMovement = (object: THREE.Object3D) => {
       const initialPosition = object.position.clone();
-      const speed = 0.2 + Math.random() * 0.3;
+      const speed = (0.2 + Math.random() * 0.3) * 1.2; // 20% faster
       const angleOffset = Math.random() * Math.PI * 2;
       const orbitRadius = 3.5; // distance from cube center
 
@@ -189,7 +189,7 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
         // Position randomly in a spherical pattern, but restrict Z so cubes don't go deep into the background
         const radius = 10 + Math.random() * 10;
         const angle = Math.random() * Math.PI * 2;
-        const zMax = 8; // maximum distance into background
+        const zMax = 2; // reduced maximum distance into background by 50%
         group.position.set(
           Math.cos(angle) * radius,
           Math.random() * 8 - 4,
