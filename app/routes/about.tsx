@@ -1,14 +1,15 @@
 import type { MetaFunction, LinksFunction } from "@remix-run/node";
 import Navbar from "~/components/navbar";
+import "../styles/about.css"; // Import the CSS file for this page
 // Remove this import
 // import aboutStylesHref from "~/styles/about.css"; 
 
 // Use direct path in links function instead
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: "/styles/about.css" },
+
+
   // If Navbar.tsx imports its own CSS (which it does: import '../styles/navbar.css';),
   // then navbar.css is handled, and no further action is needed here for it.
-];
+// ];
 
 // Make sure navbar.css is also handled, either imported in Navbar.tsx or globally if preferred
 // REMOVED DUPLICATE LINKS FUNCTION THAT WAS HERE:

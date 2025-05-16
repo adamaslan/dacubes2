@@ -1,10 +1,8 @@
 import { type MetaFunction, LinksFunction } from "@remix-run/node";
 import Navbar from '~/components/navbar';
-import contactStyles from '~/styles/contact.css';
+import "../styles/contact.css";
 
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: contactStyles }
-];
+
 
 export const meta: MetaFunction = () => {
   return [

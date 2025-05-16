@@ -1,0 +1,37 @@
+/* app/styles/index-route.css */
+
+.page-container {
+  min-height: 100vh;
+  background-color: #1a202c; /* Equivalent to Tailwind's bg-gray-900 */
+}
+
+.navbar-logo-text {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.header-content {
+  position: relative;
+  z-index: 10;
+  padding-top: 6rem; /* Equivalent to Tailwind's pt-24 */
+  text-align: center;
+}
+
+.main-title {
+  font-size: 2.25rem; /* Equivalent to Tailwind's text-4xl */
+  line-height: 2.5rem; /* Equivalent to Tailwind's text-4xl */
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 2rem; /* Equivalent to Tailwind's mb-8 */
+}
+
+.subtitle {
+  color: #ffffff;
+  /* text-align is inherited from .header-content if it's a direct child,
+     or can be added here if needed: text-align: center; */
+}
+
+.loading-message {
+  color: #ffffff;
+  text-align: center;
+}

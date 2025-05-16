@@ -1,0 +1,11 @@
+/* Add these styles to ensure proper click handling */
+canvas {
+  cursor: crosshair; /* Shows a pointer cursor when hovering over clickable elements */
+  touch-action: manipulation; /* Improves touch behavior */
+}
+
+/* Prevent text selection during clicks */
+.w-full.h-screen {
+  user-select: none;
+  -webkit-user-select: none;
+}
