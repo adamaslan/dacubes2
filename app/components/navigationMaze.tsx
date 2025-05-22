@@ -187,7 +187,7 @@ const NavigationMaze: React.FC<MazeProps> = () => {
       mazeFloorRef.current = floor;
 
       // Create walls with 8-bit texture
-      const wallGeometry = new THREE.BoxGeometry(CELL_SIZE, WALL_HEIGHT, CELL_SIZE);
+      const wallGeometry = new THREE.BoxGeometry(0.5, WALL_HEIGHT, 0.5); // Reduced from CELL_SIZE to 0.5 units
       
       // Create pixelated wall texture
       const wallCanvas = document.createElement('canvas');
@@ -312,7 +312,7 @@ const NavigationMaze: React.FC<MazeProps> = () => {
       });
 
       // Create player ball with pixelated texture
-      const ballGeometry = new THREE.BoxGeometry(BALL_RADIUS * 2, BALL_RADIUS * 2, BALL_RADIUS * 2); // Cube instead of sphere
+      const ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16); // Changed from BoxGeometry to SphereGeometry
       
       // Create pixelated ball texture
       const ballCanvas = document.createElement('canvas');
@@ -325,12 +325,21 @@ const NavigationMaze: React.FC<MazeProps> = () => {
         ballContext.fillStyle = '#FF0000';
         ballContext.fillRect(0, 0, 32, 32);
         
-        // Add some pixel details
+        // Add some pixel details - modified for spherical appearance
         ballContext.fillStyle = '#FF6666';
-        ballContext.fillRect(4, 4, 8, 8);
-        ballContext.fillRect(20, 4, 8, 8);
-        ballContext.fillRect(4, 20, 8, 8);
-        ballContext.fillRect(20, 20, 8, 8);
+        // Create a circular pattern instead of square blocks
+        const centerX = 16;
+        const centerY = 16;
+        const radius = 12;
+        ballContext.beginPath();
+        ballContext.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ballContext.fill();
+        
+        // Add highlight
+        ballContext.fillStyle = '#FFAAAA';
+        ballContext.beginPath();
+        ballContext.arc(centerX - 4, centerY - 4, radius/3, 0, Math.PI * 2);
+        ballContext.fill();
       }
       
       const ballTexture = new THREE.CanvasTexture(ballCanvas);
