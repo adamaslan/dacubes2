@@ -29,6 +29,12 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
   const animationFrameId = useRef<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const isDragging = useRef(false);
+  // Define clickableObjects at component level
+  const clickableObjects = useRef<THREE.Object3D[]>([]);
+  // Track selected object for keyboard navigation
+  const selectedObjectIndex = useRef<number>(-1);
+
   // Navigation handler for cube clicks
   const handleObjectClick = (path: string) => {
     navigate(path);
@@ -52,6 +58,17 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     mountRef.current.appendChild(renderer.domElement);
+
+    // Add OrbitControls
+    // Remove this OrbitControls section:
+    // const controls = new OrbitControls(camera, renderer.domElement);
+    // controlsRef.current = controls;
+    // controls.enableDamping = true;
+    // controls.dampingFactor = 0.05;
+    // controls.rotateSpeed = 0.5;
+    // controls.minDistance = 10;
+    // controls.maxDistance = 50;
+    // controls.enablePan = false;
 
     // Lighting setup
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -94,9 +111,12 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
     // Create shape object with text
     const createShapeObject = async (data: CubeData) => {
       const group = new THREE.Group();
+      // Add navigation data to group
+      group.userData = { path: data.link };
+      
       let mainMesh: THREE.Object3D;
       let textSprite: THREE.Sprite | null = null;
-      let textOrbitAngle = Math.random() * Math.PI * 2; // randomize initial angle
+      let textOrbitAngle = Math.random() * Math.PI * 2;
 
       if (data.modelUrl) {
         try {
@@ -132,10 +152,12 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
         mainMesh = new THREE.Mesh(geometry, material);
       }
 
-      // Add text label
+      // Add text label (after mainMesh creation)
       textSprite = createTextSprite(data.name);
       if (textSprite) {
         textSprite.position.z = 3.5;
+        textSprite.userData = { path: data.link };
+        textSprite.layers.enable(1);
         group.add(textSprite);
         // Store reference for orbit animation
         (group as any).textSprite = textSprite;
@@ -184,7 +206,15 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
 
     const loadObjects = async () => {
       const positions: THREE.Vector3[] = []; // Track existing positions
-      const minDistance = 6; // Minimum distance between cube centers (adjust based on cube size)
+      const minDistance = 6; // Minimum distance between cube centers
+      
+      // Clear clickable objects array before adding new ones
+      clickableObjects.current = [];
+      
+      // Define boundaries to ensure objects stay in visible area
+      const maxRadius = 15; // Reduced from previous value
+      const maxHeight = 6;  // Reduced from previous value
+      const maxDepth = 2;   // Keep objects closer to camera
       
       for (const data of cubes) {
         const group = await createShapeObject(data);
@@ -195,15 +225,14 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
         let newPosition = new THREE.Vector3();
         
         while (!validPosition && attempts < 50) {
-          // Position randomly in a spherical pattern, but restrict Z
-          const radius = 10 + Math.random() * 10;
+          // Position randomly in a spherical pattern with tighter constraints
+          const radius = 5 + Math.random() * maxRadius;
           const angle = Math.random() * Math.PI * 2;
-          const zMax = 2;
           
           newPosition.set(
             Math.cos(angle) * radius,
-            Math.random() * 8 - 4,
-            Math.max(-zMax, Math.min(zMax, Math.sin(angle) * radius))
+            Math.random() * maxHeight - maxHeight/2,
+            Math.max(-maxDepth, Math.min(maxDepth, Math.sin(angle) * radius))
           );
           
           // Check distance from all existing positions
@@ -225,6 +254,9 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
         group.userData = { path: data.link };
         scene.add(group);
         cubeUpdaters.push(setupCuteMovement(group));
+        
+        // Add group to clickable objects
+        clickableObjects.current.push(group);
       }
       
       setIsLoading(false);
@@ -237,20 +269,54 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
 
     // ==================== 4. INTERACTION AND ANIMATION LOOP ====================
     // Click handler for object selection
-    const handleClick = (e: MouseEvent) => {
-      if (!sceneCurrent.current) return;
+    // Track mouse events for distinguishing between dragging and clicking
+    const handleMouseDown = () => {
+      isDragging.current = false;
+    };
+
+    const handleMouseMove = () => {
+      isDragging.current = true;
+    };
+
+    // Add touch support
+    const handleTouchStart = () => {
+      isDragging.current = false;
+    };
+    
+    const handleTouchMove = () => {
+      isDragging.current = true;
+    };
+    
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isDragging.current || !sceneCurrent.current) return;
       
+      // Prevent default to avoid scrolling
+      e.preventDefault();
+      
+      const touch = e.changedTouches[0];
       const mouse = new THREE.Vector2(
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1
+        (touch.clientX / window.innerWidth) * 2 - 1,
+        -(touch.clientY / window.innerHeight) * 2 + 1
       );
       
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(sceneCurrent.current.children, true);
-
+    
       if (intersects.length > 0) {
         let clickedObject = intersects[0].object;
+        
+        // Check if the clicked object itself has navigation data
+        if (clickedObject.userData?.path) {
+          // Visual feedback before navigation
+          clickedObject.scale.multiplyScalar(1.2);
+          
+          // Delay navigation for visual feedback
+          setTimeout(() => {
+            handleObjectClick(clickedObject.userData.path);
+          }, 200);
+          return;
+        }
         
         // Traverse up to find the object with userData.path
         while (clickedObject && !clickedObject.userData?.path) {
@@ -261,7 +327,85 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
         }
         
         if (clickedObject?.userData?.path) {
-          handleObjectClick(clickedObject.userData.path);
+          // Visual feedback before navigation
+          clickedObject.scale.multiplyScalar(1.2);
+          if (clickedObject instanceof THREE.Mesh && 
+              clickedObject.material instanceof THREE.MeshStandardMaterial) {
+            clickedObject.material.emissive.set(0x333333);
+          }
+          
+          // Delay navigation for visual feedback
+          setTimeout(() => {
+            handleObjectClick(clickedObject.userData.path);
+          }, 200);
+        }
+      }
+    };
+
+    // Modify keyboard navigation handler
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!clickableObjects.current.length) return;
+      
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowDown':
+          selectedObjectIndex.current = (selectedObjectIndex.current + 1) % clickableObjects.current.length;
+          break;
+        case 'ArrowLeft':
+        case 'ArrowUp':
+          selectedObjectIndex.current = (selectedObjectIndex.current - 1 + clickableObjects.current.length) % clickableObjects.current.length;
+          break;
+        case 'Enter':
+          const selectedObject = clickableObjects.current[selectedObjectIndex.current];
+          if (selectedObject?.userData?.path) {
+            handleObjectClick(selectedObject.userData.path);
+          }
+          break;
+      }
+      
+      // Update camera focus
+      const selectedObj = clickableObjects.current[selectedObjectIndex.current];
+      if (selectedObj) {
+        camera.position.lerp(selectedObj.position.clone().add(new THREE.Vector3(0, 0, 25)), 0.3);
+      }
+    };
+
+    // Modify click handler to check if user was dragging
+    const handleClick = (e: MouseEvent) => {
+      if (isDragging.current || !sceneCurrent.current) return;
+      
+      const mouse = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+      
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(sceneCurrent.current.children, true);
+    
+      if (intersects.length > 0) {
+        let clickedObject = intersects[0].object;
+        
+        // Traverse up to find the nearest parent with navigation data
+        while (clickedObject && !clickedObject.userData?.path) {
+          if (!clickedObject.parent || clickedObject.parent === sceneCurrent.current) break;
+          clickedObject = clickedObject.parent as THREE.Object3D;
+        }
+    
+        if (clickedObject?.userData?.path) {
+          // Visual feedback with animation
+          const originalScale = clickedObject.scale.clone();
+          clickedObject.scale.multiplyScalar(1.2);
+          
+          // Animate back after delay
+          setTimeout(() => {
+            clickedObject.scale.copy(originalScale);
+          }, 200);
+          
+          // Navigate after visual feedback
+          setTimeout(() => {
+            handleObjectClick(clickedObject.userData.path);
+          }, 250);
         }
       }
     };
@@ -287,6 +431,8 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
       // Update animation mixers
       mixers.current.forEach(mixer => mixer.update(delta));
 
+
+
       if (rendererCurrent.current && sceneCurrent.current) {
         rendererCurrent.current.render(sceneCurrent.current, camera);
       }
@@ -296,8 +442,14 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
     animate();
 
     // Add event listeners
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
     window.addEventListener('click', handleClick);
     window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeyDown);
 
     // Cleanup function
     return () => {
@@ -305,8 +457,15 @@ const DaCubes4: React.FC<DaCubes4Props> = ({
         cancelAnimationFrame(animationFrameId.current);
       }
       
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('click', handleClick);
       window.removeEventListener('resize', handleResize);
+      
+
       
       if (sceneCurrent.current) {
         sceneCurrent.current.clear();
