@@ -80,9 +80,26 @@ const NavigationMaze: React.FC<MazeProps> = () => {
       // Controls
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-      controls.minDistance = 5;
-      controls.maxDistance = MAZE_SIZE * CELL_SIZE * 1.5;
+      controls.dampingFactor = 0.15; // Smoother for touch
+      controls.screenSpacePanning = true; // Better for mobile
+      controls.enableRotate = true; // Allow rotation with two-finger gesture
+      controls.rotateSpeed = 0.5; // Slower rotation
+      controls.panSpeed = 0.8; // Faster panning
+      controls.touches = {
+        ONE: THREE.TOUCH.PAN,
+        TWO: THREE.TOUCH.DOLLY_ROTATE
+      };
+      controls.maxPolarAngle = Math.PI / 2.2; // Prevent looking straight down
+      controls.minZoom = 0.7;
+      controls.maxZoom = 2.0;
+      controls.minDistance = 8; // Increased minimum zoom distance
+      controls.maxDistance = MAZE_SIZE * CELL_SIZE * 1.2; // Reduced maximum distance
+      controls.enablePan = false; // Disable panning since we're using maze tilt
+      controls.enableRotate = false;
+      controls.screenSpacePanning = false; // Better performance for ortho-like movement
+      controls.maxPolarAngle = Math.PI / 2 - 0.1;
+      controls.maxZoom = 1.5; // Limit excessive zoom-in
+      controls.minZoom = 0.8; // Limit excessive zoom-out
       controls.maxPolarAngle = Math.PI / 2 - 0.1; // Prevent going below ground
       controls.enableRotate = false; // Disable rotation to focus on maze tilting
       controlsRef.current = controls;
@@ -187,7 +204,7 @@ const NavigationMaze: React.FC<MazeProps> = () => {
       mazeFloorRef.current = floor;
 
       // Create walls with 8-bit texture
-      const wallGeometry = new THREE.BoxGeometry(0.5, WALL_HEIGHT, 0.5); // Reduced from CELL_SIZE to 0.5 units
+      const wallGeometry = new THREE.BoxGeometry(0.5, WALL_HEIGHT, 0.5);
       
       // Create pixelated wall texture
       const wallCanvas = document.createElement('canvas');
@@ -227,9 +244,9 @@ const NavigationMaze: React.FC<MazeProps> = () => {
           if (mazeGrid[z][x]) {
             const wall = new THREE.Mesh(wallGeometry, wallMaterial);
             wall.position.set(
-              x * CELL_SIZE + CELL_SIZE / 2,
+              x * CELL_SIZE,  // Align to grid X
               WALL_HEIGHT / 2,
-              z * CELL_SIZE + CELL_SIZE / 2
+              z * CELL_SIZE   // Align to grid Z
             );
             wall.castShadow = true;
             wall.receiveShadow = true;
@@ -579,10 +596,39 @@ const NavigationMaze: React.FC<MazeProps> = () => {
         keyStates.current[e.key.toLowerCase()] = false;
       };
 
-      // Add event listeners
-      window.addEventListener('keydown', handleKeyDown);
-      window.addEventListener('keyup', handleKeyUp);
+      // Add touch event listeners for mobile tilt
+      const handleTouchStart = (e: TouchEvent) => {
+        if (e.touches.length === 1) {
+          keyStates.current['ArrowLeft'] = false;
+          keyStates.current['ArrowRight'] = false;
+          keyStates.current['ArrowUp'] = false;
+          keyStates.current['ArrowDown'] = false;
+        }
+      };
 
+      const handleTouchMove = (e: TouchEvent) => {
+        if (e.touches.length === 1) {
+          const touch = e.touches[0];
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+          const deltaX = touch.clientX - centerX;
+          const deltaY = touch.clientY - centerY;
+          
+          targetMazeRotation.current.x = THREE.MathUtils.clamp(
+            deltaY * -0.0005, 
+            -MAX_TILT, 
+            MAX_TILT
+          );
+          targetMazeRotation.current.y = THREE.MathUtils.clamp(
+            deltaX * 0.0005, 
+            -MAX_TILT, 
+            MAX_TILT
+          );
+        }
+      };
+
+      renderer.domElement.addEventListener('touchstart', handleTouchStart);
+      renderer.domElement.addEventListener('touchmove', handleTouchMove);
       // Return cleanup function
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
