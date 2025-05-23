@@ -102,7 +102,7 @@ function Ball({ position }: BallProps) {
       const distanceToGoal2 = Math.sqrt((newX + 3.5) ** 2 + (newZ + 3.5) ** 2)
 
       if (distanceToGoal1 < 0.8) {
-        setTimeout(() => navigate('/'), 500)
+        setTimeout(() => navigate('/frontend'), 500)
       } else if (distanceToGoal2 < 0.8) {
         setTimeout(() => navigate('/about'), 500)
       }
@@ -191,7 +191,7 @@ function MazeGame() {
           <h3>🎮 Maze Controls</h3>
           <p>📱 Mobile: Tilt your device</p>
           <p>💻 Desktop: Use WASD or Arrow Keys</p>
-          <p>🎯 Red Goal → Home | Blue Goal → About</p>
+          <p>🎯 Red Goal → Frontend | Blue Goal → About</p>
         </div>
       )}
       
@@ -212,7 +212,7 @@ function MazeGame() {
         <MazeWalls />
         
         {/* Goals */}
-        <Goal position={[3.5, 0, 3.5]} color="#ff4757" label="HOME" />
+        <Goal position={[3.5, 0, 3.5]} color="#ff4757" label="Frontend" />
         <Goal position={[-3.5, 0, -3.5]} color="#3742fa" label="ABOUT" />
         
         {/* Ball */}
