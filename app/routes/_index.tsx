@@ -3,10 +3,12 @@ import React, { Suspense} from "react";
 import Navbar from "~/components/navbar";
 import type {  MetaFunction } from "@remix-run/node";
 
+
 import DaCubes4 from "~/components/three4";
 import "../styles/index-route.css";
 // import ThreeMaze from "~/components/maze1";
-import NavigationMaze from "~/components/navigationMaze";
+// import NavigationMaze from "~/components/navigationMaze";
+import MazePage from "~/components/maze2";
 
 export const meta: MetaFunction = () => {
   return [
@@ -50,7 +52,7 @@ export default function Index() {
           // fontUrl="https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Cfw.json"
         /> */}
         {/* <ThreeMaze /> */}
-        <NavigationMaze />
+        <MazePage />
       </Suspense>
       
     </div>
