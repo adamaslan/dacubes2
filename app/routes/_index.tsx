@@ -3,6 +3,7 @@ import React, { Suspense} from "react";
 import Navbar from "~/components/navbar";
 import type {  MetaFunction } from "@remix-run/node";
 
+
 import DaCubes4 from "~/components/three4";
 import "../styles/index-route.css";
 // import ThreeMaze from "~/components/maze1";
