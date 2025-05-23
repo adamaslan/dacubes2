@@ -38,7 +38,7 @@ function Ball({ position, mazeRotation, walls }: BallProps) { // Add walls to pr
   useEffect(() => {
     const GRAVITY = -0.05;
     const FRICTION = 0.98;
-    const BOUNCE_FACTOR = 0.7;
+    const BOUNCE_FACTOR = 0.5; // Try reducing this from 0.7
     const BALL_RADIUS = 0.2;
     const COLLISION_EPSILON = 0.01; // Small value to prevent sticking
 
