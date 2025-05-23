@@ -40,6 +40,7 @@ function Ball({ position, mazeRotation, walls }: BallProps) { // Add walls to pr
     const FRICTION = 0.98;
     const BOUNCE_FACTOR = 0.7;
     const BALL_RADIUS = 0.2;
+    const COLLISION_EPSILON = 0.01; // Small value to prevent sticking
 
     if (ballRef.current) {
       const ball = ballRef.current;
@@ -51,72 +52,91 @@ function Ball({ position, mazeRotation, walls }: BallProps) { // Add walls to pr
       newVelocityX *= FRICTION;
       newVelocityZ *= FRICTION;
 
-      let newX = ball.position.x + newVelocityX;
-      let newY = ball.position.y + newVelocityY;
-      let newZ = ball.position.z + newVelocityZ;
+      let tempNewX = ball.position.x + newVelocityX;
+      let tempNewY = ball.position.y + newVelocityY;
+      let tempNewZ = ball.position.z + newVelocityZ;
 
       const floorY = BALL_RADIUS;
-      if (newY < floorY) {
-        newY = floorY;
+      if (tempNewY < floorY) {
+        tempNewY = floorY;
         newVelocityY = -newVelocityY * BOUNCE_FACTOR;
-        newVelocityX *= 0.9;
-        newVelocityZ *= 0.9;
+        newVelocityX *= 0.9; // Extra friction on ground
+        newVelocityZ *= 0.9; // Extra friction on ground
       }
 
       // Collision with walls
       for (const wall of walls) {
-        // AABB collision detection
         const wallMinX = wall.position[0] - wall.halfExtents.x;
         const wallMaxX = wall.position[0] + wall.halfExtents.x;
         const wallMinZ = wall.position[2] - wall.halfExtents.z;
         const wallMaxZ = wall.position[2] + wall.halfExtents.z;
-        // Assuming walls are tall enough, so only checking X and Z for simplicity
-        // For Y collision with walls (if ball can jump on them), add similar logic for Y
 
-        const ballMinX = newX - BALL_RADIUS;
-        const ballMaxX = newX + BALL_RADIUS;
-        const ballMinZ = newZ - BALL_RADIUS;
-        const ballMaxZ = newZ + BALL_RADIUS;
+        // Potential new position of the ball's center
+        let ballCandidateX = tempNewX;
+        let ballCandidateZ = tempNewZ;
 
+        // Check for AABB collision
         if (
-          ballMaxX > wallMinX &&
-          ballMinX < wallMaxX &&
-          ballMaxZ > wallMinZ &&
-          ballMinZ < wallMaxZ
+          ballCandidateX + BALL_RADIUS > wallMinX &&
+          ballCandidateX - BALL_RADIUS < wallMaxX &&
+          ballCandidateZ + BALL_RADIUS > wallMinZ &&
+          ballCandidateZ - BALL_RADIUS < wallMaxZ
         ) {
-          // Collision detected, determine penetration depth and adjust
-          const overlapX1 = wallMaxX - ballMinX;
-          const overlapX2 = ballMaxX - wallMinX;
-          const overlapZ1 = wallMaxZ - ballMinZ;
-          const overlapZ2 = ballMaxZ - wallMinZ;
+          // Collision detected. Calculate penetration depths.
+          const penetrationX1 = (ballCandidateX + BALL_RADIUS) - wallMinX;
+          const penetrationX2 = wallMaxX - (ballCandidateX - BALL_RADIUS);
+          const penetrationZ1 = (ballCandidateZ + BALL_RADIUS) - wallMinZ;
+          const penetrationZ2 = wallMaxZ - (ballCandidateZ - BALL_RADIUS);
 
-          const minOverlapX = Math.min(Math.abs(overlapX1), Math.abs(overlapX2));
-          const minOverlapZ = Math.min(Math.abs(overlapZ1), Math.abs(overlapZ2));
+          // Find the minimum positive penetration depth.
+          let minPenetration = Infinity;
+          let collisionAxis = '';
 
-          if (minOverlapX < minOverlapZ) {
-            if (Math.abs(overlapX1) < Math.abs(overlapX2)) {
-              newX = wallMaxX + BALL_RADIUS;
-            } else {
-              newX = wallMinX - BALL_RADIUS;
-            }
+          if (penetrationX1 > 0 && penetrationX1 < minPenetration) {
+            minPenetration = penetrationX1;
+            collisionAxis = 'posX'; // Ball hit wall's negative X face
+          }
+          if (penetrationX2 > 0 && penetrationX2 < minPenetration) {
+            minPenetration = penetrationX2;
+            collisionAxis = 'negX'; // Ball hit wall's positive X face
+          }
+          if (penetrationZ1 > 0 && penetrationZ1 < minPenetration) {
+            minPenetration = penetrationZ1;
+            collisionAxis = 'posZ'; // Ball hit wall's negative Z face
+          }
+          if (penetrationZ2 > 0 && penetrationZ2 < minPenetration) {
+            minPenetration = penetrationZ2;
+            collisionAxis = 'negZ'; // Ball hit wall's positive Z face
+          }
+
+          // Resolve collision by pushing ball out along the axis of minimum penetration
+          if (collisionAxis === 'posX') {
+            tempNewX = wallMinX - BALL_RADIUS - COLLISION_EPSILON;
             newVelocityX = -newVelocityX * BOUNCE_FACTOR;
-          } else {
-            if (Math.abs(overlapZ1) < Math.abs(overlapZ2)) {
-              newZ = wallMaxZ + BALL_RADIUS;
-            } else {
-              newZ = wallMinZ - BALL_RADIUS;
-            }
+          } else if (collisionAxis === 'negX') {
+            tempNewX = wallMaxX + BALL_RADIUS + COLLISION_EPSILON;
+            newVelocityX = -newVelocityX * BOUNCE_FACTOR;
+          } else if (collisionAxis === 'posZ') {
+            tempNewZ = wallMinZ - BALL_RADIUS - COLLISION_EPSILON;
+            newVelocityZ = -newVelocityZ * BOUNCE_FACTOR;
+          } else if (collisionAxis === 'negZ') {
+            tempNewZ = wallMaxZ + BALL_RADIUS + COLLISION_EPSILON;
             newVelocityZ = -newVelocityZ * BOUNCE_FACTOR;
           }
         }
       }
       
-      // Boundary checks (can be kept as a fallback or adjusted if walls define the boundary)
+      // Final position update after all collisions are resolved for this frame
+      let newX = tempNewX;
+      let newY = tempNewY;
+      let newZ = tempNewZ;
+
+      // Boundary checks (can still be useful as a final safeguard)
       const boundary = 4.8; 
-      if (newX > boundary) { newX = boundary; newVelocityX = -newVelocityX * BOUNCE_FACTOR; }
-      if (newX < -boundary) { newX = -boundary; newVelocityX = -newVelocityX * BOUNCE_FACTOR; }
-      if (newZ > boundary) { newZ = boundary; newVelocityZ = -newVelocityZ * BOUNCE_FACTOR; }
-      if (newZ < -boundary) { newZ = -boundary; newVelocityZ = -newVelocityZ * BOUNCE_FACTOR; }
+      if (newX + BALL_RADIUS > boundary) { newX = boundary - BALL_RADIUS; newVelocityX = -newVelocityX * BOUNCE_FACTOR; }
+      if (newX - BALL_RADIUS < -boundary) { newX = -boundary + BALL_RADIUS; newVelocityX = -newVelocityX * BOUNCE_FACTOR; }
+      if (newZ + BALL_RADIUS > boundary) { newZ = boundary - BALL_RADIUS; newVelocityZ = -newVelocityZ * BOUNCE_FACTOR; }
+      if (newZ - BALL_RADIUS < -boundary) { newZ = -boundary + BALL_RADIUS; newVelocityZ = -newVelocityZ * BOUNCE_FACTOR; }
 
       ball.position.set(newX, newY, newZ);
       setVelocity({ x: newVelocityX, y: newVelocityY, z: newVelocityZ });
@@ -187,7 +207,7 @@ function MazeGame() {
     // Inner maze walls
     { position: [2, 0.5, -2], scale: [0.2, 1, 4] },
     { position: [-2, 0.5, 2], scale: [0.2, 1, 4] },
-    { position: [0, 0.5, 0], scale: [4, 1, 0.2] },
+    { position: [0, 0.5, 0], scale: [4, 1, 0.2] }, // Potential initial overlap if ball starts at [0, 0.5, 0]
     { position: [1, 0.5, -3.5], scale: [2, 1, 0.2] },
     { position: [-1, 0.5, 3.5], scale: [2, 1, 0.2] },
   ];
@@ -196,6 +216,46 @@ function MazeGame() {
     ...wall,
     halfExtents: { x: wall.scale[0] / 2, y: wall.scale[1] / 2, z: wall.scale[2] / 2 }
   }));
+
+  // Initial ball position - adjust if it collides with a wall
+  let initialBallPosition: [number, number, number] = [0, 0.5, 0];
+  const BALL_RADIUS = 0.2;
+
+  function isCollidingWithWall(ballPos: [number, number, number], wall: WallConfig) {
+    const wallMinX = wall.position[0] - wall.halfExtents.x;
+    const wallMaxX = wall.position[0] + wall.halfExtents.x;
+    const wallMinZ = wall.position[2] - wall.halfExtents.z;
+    const wallMaxZ = wall.position[2] + wall.halfExtents.z;
+
+    return (
+      ballPos[0] + BALL_RADIUS > wallMinX &&
+      ballPos[0] - BALL_RADIUS < wallMaxX &&
+      ballPos[2] + BALL_RADIUS > wallMinZ &&
+      ballPos[2] - BALL_RADIUS < wallMaxZ
+    );
+  }
+
+  // Check for initial collision and find a new safe spot
+  // This is a simple approach; a more robust solution might involve a grid or random placement with checks
+  let attempts = 0;
+  const maxAttempts = 100; // Prevent infinite loop
+  while (walls.some(wall => isCollidingWithWall(initialBallPosition, wall)) && attempts < maxAttempts) {
+    // Try moving the ball slightly. This is a naive fix and might need a more sophisticated placement strategy.
+    // For instance, place it at a predefined safe spot or randomly until a safe spot is found.
+    initialBallPosition[0] += 0.5; // Move along X
+    if (initialBallPosition[0] > 4.5) initialBallPosition[0] = -4.5; // Wrap around if it goes too far
+    if (walls.some(wall => isCollidingWithWall(initialBallPosition, wall))){
+        initialBallPosition[2] += 0.5; // Move along Z
+        if (initialBallPosition[2] > 4.5) initialBallPosition[2] = -4.5;
+    }
+    attempts++;
+  }
+  if (attempts >= maxAttempts){
+      console.warn("Could not find a non-colliding starting position for the ball after", maxAttempts, "attempts. Using default.");
+      // Default to a known safe position if all attempts fail, e.g., near a corner
+      initialBallPosition = [-4, 0.5, -4]; 
+  }
+
 
   useEffect(() => {
     const timer = setTimeout(() => setShowInstructions(false), 5000);
@@ -307,7 +367,7 @@ function MazeGame() {
         </group>
         
         {/* Ball - position is absolute, but affected by mazeRotation prop */}
-        <Ball position={[0, 0.5, 0]} mazeRotation={mazeRotation} walls={walls} /> {/* Pass walls to Ball */}
+        <Ball position={initialBallPosition} mazeRotation={mazeRotation} walls={walls} /> {/* Pass walls to Ball */}
         
         <OrbitControls 
           enablePan={false} 
