@@ -44,8 +44,8 @@ function Ball({ position, mazeRotation }: BallProps) {
       const ball = ballRef.current;
 
       // Apply gravity based on maze tilt
-      let newVelocityX = velocity.x + mazeRotation.x * 0.1; // Adjust multiplier for sensitivity
-      let newVelocityZ = velocity.z + mazeRotation.z * 0.1; // Adjust multiplier for sensitivity
+      let newVelocityX = velocity.x + mazeRotation.x * 0.15; // Increased sensitivity
+      let newVelocityZ = velocity.z + mazeRotation.z * 0.15; // Increased sensitivity
       let newVelocityY = velocity.y + GRAVITY;
 
       // Apply friction
