@@ -6,13 +6,15 @@ import * as THREE from 'three'
 
 // TypeScript interfaces for better type safety
 interface BallProps {
-  position: [number, number, number]
-  onGoalReached?: () => void
+  position: [number, number, number];
+  mazeRotation: { x: number; z: number }; // Add mazeRotation prop
+  // onGoalReached?: () => void; // This can be re-added later if needed
 }
 
 interface Velocity {
-  x: number
-  z: number
+  x: number;
+  y: number; // For vertical movement due to gravity
+  z: number;
 }
 
 interface WallConfig {
@@ -26,95 +28,73 @@ interface GoalProps {
   label: string
 }
 
-function Ball({ position }: BallProps) {
-  const ballRef = useRef<THREE.Mesh>(null)
-  const [velocity, setVelocity] = useState<Velocity>({ x: 0, z: 0 })
-  const navigate = useNavigate()
+function Ball({ position, mazeRotation }: BallProps) {
+  const ballRef = useRef<THREE.Mesh>(null);
+  // Velocity will now be affected by gravity based on maze tilt
+  const [velocity, setVelocity] = useState<Velocity>({ x: 0, y: 0, z: 0 });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const handleDeviceMotion = (event: DeviceMotionEvent) => {
-      if (event.accelerationIncludingGravity) {
-        const { x, y } = event.accelerationIncludingGravity
-        setVelocity({ x: (x || 0) * 0.001, z: (y || 0) * 0.001 })
-      }
-    }
+    // Gravity constant - adjust as needed
+    const GRAVITY = -0.05; // Negative for downward force
+    const FRICTION = 0.98; // Dampens movement
+    const BOUNCE_FACTOR = 0.7; // How much the ball bounces
 
-    const handleKeyPress = (event: KeyboardEvent) => {
-      const speed = 0.02
-      switch (event.key) {
-        case 'ArrowLeft':
-        case 'a':
-          setVelocity(prev => ({ ...prev, x: -speed }))
-          break
-        case 'ArrowRight':
-        case 'd':
-          setVelocity(prev => ({ ...prev, x: speed }))
-          break
-        case 'ArrowUp':
-        case 'w':
-          setVelocity(prev => ({ ...prev, z: -speed }))
-          break
-        case 'ArrowDown':
-        case 's':
-          setVelocity(prev => ({ ...prev, z: speed }))
-          break
-      }
-    }
-
-    const handleKeyUp = () => {
-      setVelocity({ x: 0, z: 0 })
-    }
-
-    // Request device motion permission for iOS with proper typing
-    if (typeof DeviceMotionEvent !== 'undefined' && 'requestPermission' in DeviceMotionEvent) {
-      (DeviceMotionEvent.requestPermission as () => Promise<'granted' | 'denied'>)()
-        .then(response => {
-          if (response === 'granted') {
-            window.addEventListener('devicemotion', handleDeviceMotion)
-          }
-        })
-        .catch(console.error)
-    } else {
-      window.addEventListener('devicemotion', handleDeviceMotion)
-    }
-
-    window.addEventListener('keydown', handleKeyPress)
-    window.addEventListener('keyup', handleKeyUp)
-
-    return () => {
-      window.removeEventListener('devicemotion', handleDeviceMotion)
-      window.removeEventListener('keydown', handleKeyPress)
-      window.removeEventListener('keyup', handleKeyUp)
-    }
-  }, [])
-
-  useEffect(() => {
     if (ballRef.current) {
-      const ball = ballRef.current
-      const newX = Math.max(-4.5, Math.min(4.5, ball.position.x + velocity.x))
-      const newZ = Math.max(-4.5, Math.min(4.5, ball.position.z + velocity.z))
-      
-      ball.position.x = newX
-      ball.position.z = newZ
+      const ball = ballRef.current;
 
-      // Check for goal collisions
-      const distanceToGoal1 = Math.sqrt((newX - 3.5) ** 2 + (newZ - 3.5) ** 2)
-      const distanceToGoal2 = Math.sqrt((newX + 3.5) ** 2 + (newZ + 3.5) ** 2)
+      // Apply gravity based on maze tilt
+      let newVelocityX = velocity.x + mazeRotation.x * 0.1; // Adjust multiplier for sensitivity
+      let newVelocityZ = velocity.z + mazeRotation.z * 0.1; // Adjust multiplier for sensitivity
+      let newVelocityY = velocity.y + GRAVITY;
+
+      // Apply friction
+      newVelocityX *= FRICTION;
+      newVelocityZ *= FRICTION;
+
+      // Update ball position
+      let newX = ball.position.x + newVelocityX;
+      let newY = ball.position.y + newVelocityY;
+      let newZ = ball.position.z + newVelocityZ;
+
+      // Collision with floor (simple)
+      const floorY = 0.2; // Ball radius
+      if (newY < floorY) {
+        newY = floorY;
+        newVelocityY = -newVelocityY * BOUNCE_FACTOR; // Bounce
+        // Apply more friction when on the ground
+        newVelocityX *= 0.9;
+        newVelocityZ *= 0.9;
+      }
+
+      // Boundary checks (simple, assuming maze is centered at 0,0 and has size 10x10)
+      const boundary = 4.8; // Half maze size minus ball radius
+      if (newX > boundary) { newX = boundary; newVelocityX = -newVelocityX * BOUNCE_FACTOR; }
+      if (newX < -boundary) { newX = -boundary; newVelocityX = -newVelocityX * BOUNCE_FACTOR; }
+      if (newZ > boundary) { newZ = boundary; newVelocityZ = -newVelocityZ * BOUNCE_FACTOR; }
+      if (newZ < -boundary) { newZ = -boundary; newVelocityZ = -newVelocityZ * BOUNCE_FACTOR; }
+      
+      ball.position.set(newX, newY, newZ);
+      setVelocity({ x: newVelocityX, y: newVelocityY, z: newVelocityZ });
+
+      // Check for goal collisions (adjust positions as needed)
+      const distanceToGoal1 = Math.sqrt((newX - 3.5) ** 2 + (newZ - 3.5) ** 2);
+      const distanceToGoal2 = Math.sqrt((newX + 3.5) ** 2 + (newZ + 3.5) ** 2);
 
       if (distanceToGoal1 < 0.8) {
-        setTimeout(() => navigate('/frontend'), 500)
+        setTimeout(() => navigate('/frontend'), 500); // Updated navigation path
       } else if (distanceToGoal2 < 0.8) {
-        setTimeout(() => navigate('/about'), 500)
+        setTimeout(() => navigate('/about'), 500);
       }
     }
-  }, [velocity, navigate])
+  }, [velocity, mazeRotation, navigate]); // Add mazeRotation to dependencies
 
   return (
     <mesh ref={ballRef} position={position}>
       <sphereGeometry args={[0.2, 32, 32]} />
       <meshStandardMaterial color="#ff6b6b" metalness={0.3} roughness={0.4} />
     </mesh>
-  )
+  );
 }
 
 function MazeWalls() {
@@ -165,12 +145,72 @@ function Goal({ position, color, label }: GoalProps) {
 }
 
 function MazeGame() {
-  const [showInstructions, setShowInstructions] = useState<boolean>(true)
+  const [showInstructions, setShowInstructions] = useState<boolean>(true);
+  // Add state for maze rotation
+  const [mazeRotation, setMazeRotation] = useState({ x: 0, z: 0 });
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowInstructions(false), 5000)
-    return () => clearTimeout(timer)
-  }, [])
+    const timer = setTimeout(() => setShowInstructions(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Event handlers for maze tilt
+  useEffect(() => {
+    const handleDeviceMotion = (event: DeviceMotionEvent) => {
+      if (event.accelerationIncludingGravity && event.rotationRate) {
+        // Using rotationRate might be more direct for tilt control
+        // Adjust sensitivity as needed
+        const tiltX = (event.rotationRate.beta || 0) * 0.005; // Tilting phone forward/backward
+        const tiltZ = (event.rotationRate.alpha || 0) * 0.005; // Tilting phone left/right
+        
+        // Clamp values to prevent extreme tilts
+        setMazeRotation({
+          x: Math.max(-0.5, Math.min(0.5, tiltX)),
+          z: Math.max(-0.5, Math.min(0.5, tiltZ)),
+        });
+      }
+    };
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+      const tiltAmount = 0.05; // How much to tilt per key press
+      setMazeRotation(prev => {
+        let newX = prev.x;
+        let newZ = prev.z;
+        switch (event.key) {
+          case 'ArrowLeft': case 'a': newZ += tiltAmount; break;
+          case 'ArrowRight': case 'd': newZ -= tiltAmount; break;
+          case 'ArrowUp': case 'w': newX += tiltAmount; break;
+          case 'ArrowDown': case 's': newX -= tiltAmount; break;
+        }
+        // Clamp values
+        return {
+          x: Math.max(-0.5, Math.min(0.5, newX)),
+          z: Math.max(-0.5, Math.min(0.5, newZ)),
+        };
+      });
+    };
+
+    // No need for keyUp to reset tilt, it should persist
+
+    if (typeof DeviceMotionEvent !== 'undefined' && 'requestPermission' in DeviceMotionEvent) {
+      (DeviceMotionEvent.requestPermission as () => Promise<'granted' | 'denied'>)()
+        .then(response => {
+          if (response === 'granted') {
+            window.addEventListener('devicemotion', handleDeviceMotion);
+          }
+        })
+        .catch(console.error);
+    } else {
+      window.addEventListener('devicemotion', handleDeviceMotion);
+    }
+
+    window.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      window.removeEventListener('devicemotion', handleDeviceMotion);
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
 
   return (
     <>
@@ -189,9 +229,9 @@ function MazeGame() {
           maxWidth: '90%'
         }}>
           <h3>🎮 Maze Controls</h3>
-          <p>📱 Mobile: Tilt your device</p>
-          <p>💻 Desktop: Use WASD or Arrow Keys</p>
-          <p>🎯 Red Goal → Frontend | Blue Goal → About</p>
+          <p>📱 Mobile: Tilt your device to tilt the maze</p>
+          <p>💻 Desktop: Use WASD or Arrow Keys to tilt the maze</p>
+          <p>🎯 Guide the ball to the goals!</p>
         </div>
       )}
       
@@ -203,20 +243,23 @@ function MazeGame() {
         <pointLight position={[10, 10, 10]} intensity={1} />
         <pointLight position={[-10, 10, -10]} intensity={0.5} />
         
-        {/* Maze floor */}
-        <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[10, 10]} />
-          <meshStandardMaterial color="#f0f0f0" />
-        </mesh>
+        {/* Group for maze elements to apply rotation */}
+        <group rotation={[mazeRotation.x, 0, mazeRotation.z]}> 
+          {/* Maze floor */}
+          <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[10, 10]} />
+            <meshStandardMaterial color="#f0f0f0" />
+          </mesh>
+          
+          <MazeWalls />
+          
+          {/* Goals - their positions are relative to the rotated group */}
+          <Goal position={[3.5, 0.1, 3.5]} color="#ff4757" label="FRONTEND" />
+          <Goal position={[-3.5, 0.1, -3.5]} color="#3742fa" label="ABOUT" />
+        </group>
         
-        <MazeWalls />
-        
-        {/* Goals */}
-        <Goal position={[3.5, 0, 3.5]} color="#ff4757" label="Frontend" />
-        <Goal position={[-3.5, 0, -3.5]} color="#3742fa" label="ABOUT" />
-        
-        {/* Ball */}
-        <Ball position={[0, 0.5, 0]} />
+        {/* Ball - position is absolute, but affected by mazeRotation prop */}
+        <Ball position={[0, 0.5, 0]} mazeRotation={mazeRotation} />
         
         <OrbitControls 
           enablePan={false} 
@@ -227,7 +270,7 @@ function MazeGame() {
         />
       </Canvas>
     </>
-  )
+  );
 }
 
 export default function MazePage() {
