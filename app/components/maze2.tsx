@@ -36,7 +36,7 @@ function Ball({ position, mazeRotation, walls }: BallProps) { // Add walls to pr
   const navigate = useNavigate();
 
   useEffect(() => {
-    const GRAVITY = -0.05;
+    const GRAVITY = -0.02;
     const FRICTION = 0.98;
     const BOUNCE_FACTOR = 0.5; // Try reducing this from 0.7
     const BALL_RADIUS = 0.2;
