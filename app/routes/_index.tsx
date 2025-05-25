@@ -5,6 +5,7 @@ import type {  MetaFunction } from "@remix-run/node";
 
 
 import DaCubes4 from "~/components/three4";
+import DreiNav from "~/components/DreiNav";
 import "../styles/index-route.css";
 // import ThreeMaze from "~/components/maze1";
 // import NavigationMaze from "~/components/navigationMaze";
@@ -45,6 +46,7 @@ export default function Index() {
       </div>
 
       <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> {/* Changed from Tailwind classes */}
+        <DreiNav />
         {/* <DaCubes4 
           cubes={customCubes}
           // textSize={0.8} // Removed this line
@@ -52,7 +54,7 @@ export default function Index() {
           // fontUrl="https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Cfw.json"
         /> */}
         {/* <ThreeMaze /> */}
-        <MazePage />
+        {/* <MazePage /> */}
       </Suspense>
       
     </div>
