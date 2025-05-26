@@ -3,6 +3,35 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useNavigate } from '@remix-run/react';
 
+// Function to create text sprite
+const createTextSprite = (text: string) => {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (!context) return null;
+  
+  // Set canvas dimensions
+  canvas.width = 256;
+  canvas.height = 128;
+  
+  // Draw background (transparent)
+  context.fillStyle = 'rgba(0,0,0,0)';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Text styling
+  context.font = 'Bold 24px Arial';
+  context.textAlign = 'center';
+  context.fillStyle = 'black';
+  context.fillText(text, canvas.width / 2, canvas.height / 2);
+  
+  // Create texture and sprite
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.SpriteMaterial({ map: texture });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(2, 1, 1);
+  
+  return sprite;
+};
+
 type VanillaGridMazeProps = {
   destinations?: {
     name: string;
@@ -60,6 +89,21 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({
     const grid = new THREE.GridHelper(20, 20);
     scene.add(grid);
     
+    // Add grid numbering
+    for (let i = 0; i <= 20; i++) {
+      for (let j = 0; j <= 20; j++) {
+        // Only add numbers at intervals to avoid cluttering
+        if (i % 5 === 0 && j % 5 === 0) {
+          const gridText = createTextSprite(`${i},${j}`);
+          if (gridText) {
+            gridText.position.set(i, 0.1, j);
+            gridText.scale.set(1, 0.5, 1); // Make the grid numbers smaller
+            scene.add(gridText);
+          }
+        }
+      }
+    }
+    
     // Create highlight mesh
     const highlightMesh = new THREE.Mesh(
       new THREE.PlaneGeometry(1, 1),
@@ -89,40 +133,11 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({
     // Array to store created objects
     const objects: THREE.Mesh[] = [];
     
-    // Function to create text sprite
-    const createTextSprite = (text: string) => {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      if (!context) return null;
-      
-      // Set canvas dimensions
-      canvas.width = 256;
-      canvas.height = 128;
-      
-      // Draw background (transparent)
-      context.fillStyle = 'rgba(0,0,0,0)';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Text styling
-      context.font = 'Bold 24px Arial';
-      context.textAlign = 'center';
-      context.fillStyle = 'black';
-      context.fillText(text, canvas.width / 2, canvas.height / 2);
-      
-      // Create texture and sprite
-      const texture = new THREE.CanvasTexture(canvas);
-      const material = new THREE.SpriteMaterial({ map: texture });
-      const sprite = new THREE.Sprite(material);
-      sprite.scale.set(2, 1, 1);
-      
-      return sprite;
-    };
-    
     // Create destination objects with text labels
     destinations.forEach(dest => {
       // Create sphere for destination
       const sphereClone = sphereMesh.clone();
-      sphereClone.position.set(dest.position[0] + 0.5, 0.5, dest.position[1] + 0.5);
+      sphereClone.position.set(dest.position[0] + 0.5, 0.4, dest.position[1] + 0.5);
       sphereClone.material = new THREE.MeshBasicMaterial({
         color: 0x00AAFF,
         wireframe: false
@@ -161,8 +176,12 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({
         });
         
         if (!objectExist) {
+          // Just make the highlight less visible when not over an object
+          highlightMesh.material.opacity = 0.2;
           highlightMesh.material.color.setHex(0xFFFFFF);
         } else {
+          // Make highlight more visible when over an object
+          highlightMesh.material.opacity = 0.5;
           highlightMesh.material.color.setHex(0xFF0000);
         }
       }
@@ -193,22 +212,8 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({
             navigate(clickedObject.userData.path);
           }, 200);
         }
-        return;
       }
-      
-      // If not clicking on a navigation object, add a new sphere
-      const objectExist = objects.find(function(object) {
-        return (object.position.x === highlightMesh.position.x) &&
-               (object.position.z === highlightMesh.position.z);
-      });
-      
-      if (!objectExist && intersects.length > 0) {
-        const sphereClone = sphereMesh.clone();
-        sphereClone.position.copy(highlightMesh.position);
-        scene.add(sphereClone);
-        objects.push(sphereClone);
-        highlightMesh.material.color.setHex(0xFF0000);
-      }
+      // Removed the code that creates new objects when clicking on empty cells
     };
     
     const handleMouseMove2 = () => {
@@ -224,12 +229,13 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({
     
     // Animation function
     function animate(time: number) {
-      highlightMesh.material.opacity = 1 + Math.sin(time / 120);
+      highlightMesh.material.opacity = 0.2 + 0.3 * Math.sin(time / 120);
       
       objects.forEach(function(object) {
         object.rotation.x = time / 1000;
         object.rotation.z = time / 1000;
-        object.position.y = 0.5 + 0.5 * Math.abs(Math.sin(time / 1000));
+        // Reduce the height variation to keep objects closer to grid
+        object.position.y = 0.4 + 0.1 * Math.abs(Math.sin(time / 1000));
       });
       
       renderer.render(scene, camera);
