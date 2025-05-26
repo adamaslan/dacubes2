@@ -2,7 +2,8 @@
 import React, { Suspense} from "react";
 import Navbar from "~/components/navbar";
 import type {  MetaFunction } from "@remix-run/node";
-
+// import GridMaze from '~/components/GridMaze';
+import VanillaGridMaze from '~/components/VanillaGridMaze';
 
 import DaCubes4 from "~/components/three4";
 import DreiNav from "~/components/DreiNav";
@@ -46,17 +47,9 @@ export default function Index() {
       </div>
 
       <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> {/* Changed from Tailwind classes */}
-        <DreiNav />
-        {/* <DaCubes4 
-          cubes={customCubes}
-          // textSize={0.8} // Removed this line
-          // engraveDepth={0.3}
-          // fontUrl="https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Cfw.json"
-        /> */}
-        {/* <ThreeMaze /> */}
-        {/* <MazePage /> */}
+        <VanillaGridMaze />
+        {/* Comment out other components */}
       </Suspense>
-      
     </div>
   );
 }
