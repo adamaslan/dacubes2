@@ -48,10 +48,28 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({
   ] 
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   
   useEffect(() => {
     if (!mountRef.current) return;
+    
+    // Create tooltip element
+    const tooltip = document.createElement('div');
+    tooltip.style.position = 'absolute';
+    tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    tooltip.style.color = 'white';
+    tooltip.style.padding = '8px 12px';
+    tooltip.style.borderRadius = '4px';
+    tooltip.style.fontSize = '14px';
+    tooltip.style.pointerEvents = 'none';
+    tooltip.style.opacity = '0';
+    tooltip.style.transition = 'opacity 0.2s';
+    tooltip.style.zIndex = '1000';
+    tooltip.style.maxWidth = '200px';
+    tooltip.style.textAlign = 'center';
+    document.body.appendChild(tooltip);
+Object.assign(tooltipRef, { current: tooltip as HTMLDivElement });
     
     // Initialize renderer
     const renderer = new THREE.WebGLRenderer();
@@ -179,10 +197,23 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({
           // Just make the highlight less visible when not over an object
           highlightMesh.material.opacity = 0.2;
           highlightMesh.material.color.setHex(0xFFFFFF);
+          
+          // Hide tooltip when not over a navigation object
+          if (tooltipRef.current) {
+            tooltipRef.current.style.opacity = '0';
+          }
         } else {
           // Make highlight more visible when over an object
           highlightMesh.material.opacity = 0.5;
           highlightMesh.material.color.setHex(0xFF0000);
+          
+          // Show tooltip with destination info
+          if (tooltipRef.current && objectExist.userData?.name) {
+            tooltipRef.current.textContent = `Click to navigate to: ${objectExist.userData.name}`;
+            tooltipRef.current.style.opacity = '1';
+            tooltipRef.current.style.left = `${e.clientX + 10}px`;
+            tooltipRef.current.style.top = `${e.clientY + 10}px`;
+          }
         }
       }
     };
@@ -278,6 +309,11 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({
           }
         }
       });
+      
+      // Remove tooltip
+      if (tooltipRef.current) {
+        document.body.removeChild(tooltipRef.current);
+      }
     };
   }, [destinations, navigate]);
   
