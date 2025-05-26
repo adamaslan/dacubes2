@@ -5,38 +5,32 @@ import { useNavigate } from '@remix-run/react';
 
 // Function to create text sprite
 const createTextSprite = (text: string) => {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
+  const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
   if (!context) return null;
-  
-  // Set canvas dimensions
-  canvas.width = 256;
-  canvas.height = 128;
-  
-  // Draw background (transparent)
+
+  [canvas.width, canvas.height] = [256, 128];
   context.fillStyle = 'rgba(0,0,0,0)';
   context.fillRect(0, 0, canvas.width, canvas.height);
-  
-  // Text styling
-  context.font = 'Bold 24px Arial';
-  context.textAlign = 'center';
-  context.fillStyle = 'black';
-  context.fillText(text, canvas.width / 2, canvas.height / 2);
-  
-  // Create texture and sprite
-  const texture = new THREE.CanvasTexture(canvas);
-  const material = new THREE.SpriteMaterial({ map: texture });
-  const sprite = new THREE.Sprite(material);
-  sprite.scale.set(2, 1, 1);
-  
-  return sprite;
+
+  Object.assign(context, {
+    font: 'Bold 24px Arial',
+    textAlign: 'center',
+    fillStyle: 'black'
+  });
+  context.fillText(text, canvas.width/2, canvas.height/2);
+
+  return new THREE.Sprite(
+    new THREE.SpriteMaterial({ 
+      map: new THREE.CanvasTexture(canvas) 
+    })
+  ).scale.set(2, 1, 1);
 };
 
 type VanillaGridMazeProps = {
   destinations?: {
     name: string;
     link: string;
-    position: [number, number]; // [x, z] position on grid
+    position: [number, number];
   }[];
 };
 
