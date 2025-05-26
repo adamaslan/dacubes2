@@ -157,7 +157,7 @@ Object.assign(tooltipRef, { current: tooltip as HTMLDivElement });
       const sphereClone = sphereMesh.clone();
       sphereClone.position.set(dest.position[0] + 0.5, 0.4, dest.position[1] + 0.5);
       sphereClone.material = new THREE.MeshBasicMaterial({
-        color: 0x00AAFF,
+        color: 0x39FF14, // Changed from 0x00AAFF to neon green
         wireframe: false
       });
       
