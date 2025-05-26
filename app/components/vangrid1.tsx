@@ -1,13 +1,25 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { useNavigate } from '@remix-run/react';
 
 type VanillaGridMazeProps = {
-  // You can add props here if needed
+  destinations?: {
+    name: string;
+    link: string;
+    position: [number, number]; // [x, z] position on grid
+  }[];
 };
 
-const VanillaGridMaze: React.FC<VanillaGridMazeProps> = () => {
+const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ 
+  destinations = [
+    { name: "Page 1", link: "/", position: [5, 5] },
+    { name: "About", link: "/about", position: [10, 5] },
+    { name: "Contact", link: "/contact", position: [5, 10] }
+  ] 
+}) => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   
   useEffect(() => {
     if (!mountRef.current) return;
@@ -77,6 +89,60 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = () => {
     // Array to store created objects
     const objects: THREE.Mesh[] = [];
     
+    // Function to create text sprite
+    const createTextSprite = (text: string) => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return null;
+      
+      // Set canvas dimensions
+      canvas.width = 256;
+      canvas.height = 128;
+      
+      // Draw background (transparent)
+      context.fillStyle = 'rgba(0,0,0,0)';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Text styling
+      context.font = 'Bold 24px Arial';
+      context.textAlign = 'center';
+      context.fillStyle = 'black';
+      context.fillText(text, canvas.width / 2, canvas.height / 2);
+      
+      // Create texture and sprite
+      const texture = new THREE.CanvasTexture(canvas);
+      const material = new THREE.SpriteMaterial({ map: texture });
+      const sprite = new THREE.Sprite(material);
+      sprite.scale.set(2, 1, 1);
+      
+      return sprite;
+    };
+    
+    // Create destination objects with text labels
+    destinations.forEach(dest => {
+      // Create sphere for destination
+      const sphereClone = sphereMesh.clone();
+      sphereClone.position.set(dest.position[0] + 0.5, 0.5, dest.position[1] + 0.5);
+      sphereClone.material = new THREE.MeshBasicMaterial({
+        color: 0x00AAFF,
+        wireframe: false
+      });
+      
+      // Add navigation data to sphere
+      sphereClone.userData = { path: dest.link, name: dest.name };
+      
+      // Create text sprite
+      const textSprite = createTextSprite(dest.name);
+      if (textSprite) {
+        textSprite.position.set(dest.position[0] + 0.5, 1.5, dest.position[1] + 0.5);
+        textSprite.userData = { path: dest.link };
+        scene.add(textSprite);
+      }
+      
+      scene.add(sphereClone);
+      objects.push(sphereClone);
+    });
+    
     // Handle mouse move
     const handleMouseMove = (e: MouseEvent) => {
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -102,23 +168,51 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = () => {
       }
     };
     
-    // Handle mouse down
+    // Track if user is dragging
+    let isDragging = false;
+    
     const handleMouseDown = () => {
+      isDragging = false;
+    };
+    
+    const handleMouseUp = (e: MouseEvent) => {
+      if (isDragging) return;
+      
+      // Check if we clicked on an object with navigation data
+      raycaster.setFromCamera(mousePosition, camera);
+      const objectIntersects = raycaster.intersectObjects(objects);
+      
+      if (objectIntersects.length > 0) {
+        const clickedObject = objectIntersects[0].object;
+        if (clickedObject.userData?.path) {
+          // Visual feedback
+          clickedObject.scale.multiplyScalar(1.2);
+          
+          // Navigate after a short delay
+          setTimeout(() => {
+            navigate(clickedObject.userData.path);
+          }, 200);
+        }
+        return;
+      }
+      
+      // If not clicking on a navigation object, add a new sphere
       const objectExist = objects.find(function(object) {
         return (object.position.x === highlightMesh.position.x) &&
                (object.position.z === highlightMesh.position.z);
       });
       
-      if (!objectExist) {
-        if (intersects.length > 0) {
-          const sphereClone = sphereMesh.clone();
-          sphereClone.position.copy(highlightMesh.position);
-          scene.add(sphereClone);
-          objects.push(sphereClone);
-          highlightMesh.material.color.setHex(0xFF0000);
-        }
+      if (!objectExist && intersects.length > 0) {
+        const sphereClone = sphereMesh.clone();
+        sphereClone.position.copy(highlightMesh.position);
+        scene.add(sphereClone);
+        objects.push(sphereClone);
+        highlightMesh.material.color.setHex(0xFF0000);
       }
-      console.log(scene.children.length);
+    };
+    
+    const handleMouseMove2 = () => {
+      isDragging = true;
     };
     
     // Handle window resize
@@ -144,6 +238,8 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = () => {
     // Add event listeners
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMouseMove2);
     window.addEventListener('resize', handleResize);
     
     // Start animation loop
@@ -153,6 +249,8 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = () => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMouseMove2);
       window.removeEventListener('resize', handleResize);
       
       // Stop animation loop
@@ -175,7 +273,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = () => {
         }
       });
     };
-  }, []);
+  }, [destinations, navigate]);
   
   return <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />;
 };

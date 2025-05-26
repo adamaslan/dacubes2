@@ -3,7 +3,7 @@ import React, { Suspense} from "react";
 import Navbar from "~/components/navbar";
 import type {  MetaFunction } from "@remix-run/node";
 // import GridMaze from '~/components/GridMaze';
-import VanillaGridMaze from '~/components/VanillaGridMaze';
+import VanillaGridMaze from '~/components/vangrid1';
 
 import DaCubes4 from "~/components/three4";
 import DreiNav from "~/components/DreiNav";
