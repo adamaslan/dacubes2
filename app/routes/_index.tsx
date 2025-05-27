@@ -7,6 +7,7 @@ import VanillaGridMaze from '~/components/vangrid1';
 
 import DaCubes4 from "~/components/three4";
 import DreiNav from "~/components/DreiNav";
+import TextAnimation from "~/components/TextAnimation";
 import "../styles/index-route.css";
 // import ThreeMaze from "~/components/maze1";
 // import NavigationMaze from "~/components/navigationMaze";
@@ -44,6 +45,15 @@ export default function Index() {
         Interactive 3D cubes for navigation to other pages
         </h1>
         <h2 className="subtitle" style={{fontFamily: "'Permanent Marker', cursive"}}>Click on the cubes!</h2>
+      </div>
+
+      {/* Add TextAnimation component */}
+      <div style={{ height: '300px', marginBottom: '30px' }}>
+        <TextAnimation 
+          message="Welcome to Adam's Portfolio" 
+          fontPath="/fonts/ChakraPetch-Bold.ttf" 
+          bgHue={0.3} 
+        />
       </div>
 
       <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> {/* Changed from Tailwind classes */}
