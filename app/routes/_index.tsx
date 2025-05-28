@@ -7,7 +7,7 @@ import VanillaGridMaze from '~/components/vangrid1';
 
 import DaCubes4 from "~/components/three4";
 import DreiNav from "~/components/DreiNav";
-import TextAnimation from "~/components/TextAnimation";
+import TextAnimation from "../components/TextAnimation";
 import "../styles/index-route.css";
 // import ThreeMaze from "~/components/maze1";
 // import NavigationMaze from "~/components/navigationMaze";
@@ -48,17 +48,20 @@ export default function Index() {
       </div>
 
       {/* Add TextAnimation component */}
-      <div style={{ height: '300px', marginBottom: '30px' }}>
-        <TextAnimation 
+      {/* <div style={{ height: '300px', marginBottom: '30px' }}> */}
+        {/* <TextAnimation 
           message="Welcome to Adam's Portfolio" 
           fontPath="/fonts/ChakraPetch-Bold.ttf" 
           bgHue={0.3} 
-        />
-      </div>
+        /> */}
+      {/* </div> */}
 
-      <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> {/* Changed from Tailwind classes */}
-        <VanillaGridMaze />
+      <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> 
+        {/* <VanillaGridMaze /> */}
         {/* Comment out other components */}
+        <div style={{ width: '100vw', height: '100vh', background: '#282c34' }}>
+    <TextAnimation text="Hello Three.js!" />
+  </div>
       </Suspense>
     </div>
   );
