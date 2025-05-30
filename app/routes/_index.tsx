@@ -60,7 +60,7 @@ export default function Index() {
         {/* <VanillaGridMaze /> */}
         {/* Comment out other components */}
         <div style={{ width: '100vw', height: '100vh', background: '#282c34' }}>
-    <TextAnimation text="Hello Three.js!" />
+    <TextAnimation text="Welcome to My Portfolio!" />
   </div>
       </Suspense>
     </div>
