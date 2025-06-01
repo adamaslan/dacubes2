@@ -81,8 +81,8 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
 
     const time = state.clock.elapsedTime;
     
-    // Smooth movement with sine wave variation
-    pathOffset.current += delta * (0.08 + Math.sin(time * 0.5) * 0.02);
+    // Reduced movement speed by 75% for more stable letter positioning
+    pathOffset.current += delta * (0.02 + Math.sin(time * 0.3) * 0.005);
     
     const scrollInfluence = scroll ? scroll.offset * 0.4 : 0;
     const totalOffset = (pathOffset.current + scrollInfluence + initialOffset) % 1;
@@ -91,9 +91,9 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
     const position = curve.getPoint(totalOffset);
     const tangent = curve.getTangent(totalOffset);
     
-    // Add floating motion
-    const floatY = Math.sin(time * 2 + initialOffset * 10) * 0.1;
-    const floatX = Math.cos(time * 1.5 + initialOffset * 8) * 0.05;
+    // Reduced floating motion by 50% for more stability
+    const floatY = Math.sin(time * 1.2 + initialOffset * 10) * 0.05;
+    const floatX = Math.cos(time * 0.8 + initialOffset * 8) * 0.025;
     
     position.y += floatY;
     position.x += floatX;
@@ -311,16 +311,18 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
     return letters.map((letter, index) => {
       if (letter === ' ') return { letter, skip: true };
       
+      // Fixed spacing ensures letters maintain their order
       const letterSpacing = .375 / totalLetters; // Reduced by 25% from .5
-      const letterOffset = index * letterSpacing;
+      // Add a fixed component to the offset to maintain order
+      const letterOffset = (index * letterSpacing) % 1;
       
-      // Dynamic curve generation with variation
+      // Reduced variation in the dynamic curve generation
       const offsetPositions = scaledHandlePos.map((pos, posIndex) => {
-        const variation = selectedLetter === index ? 1.2 : 1.0;
+        const variation = selectedLetter === index ? 1.1 : 1.0;
         const offset = new THREE.Vector3(
-          Math.sin(index * 0.5) * 0.3 * variation,  // Reduced horizontal variation
-          Math.cos(index * 0.3) * 0.2 * variation,  // Reduced vertical variation
-          Math.sin(index * 0.4) * 0.2 * variation   // Reduced depth variation
+          Math.sin(index * 0.3) * 0.2 * variation,  // Further reduced variation
+          Math.cos(index * 0.2) * 0.15 * variation, // Further reduced variation
+          Math.sin(index * 0.25) * 0.1 * variation  // Further reduced variation
         );
         return pos.clone().add(offset);
       });
