@@ -311,7 +311,7 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
     return letters.map((letter, index) => {
       if (letter === ' ') return { letter, skip: true };
       
-      const letterSpacing = 1 / totalLetters;
+      const letterSpacing = .5 / totalLetters;
       const letterOffset = index * letterSpacing;
       
       // Dynamic curve generation with variation
@@ -388,12 +388,12 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
         return (
           <group
             key={`${data.letter}-${index}`}
-            onPointerOver={() => handleLetterInteraction(data.index)}
+            onPointerOver={() => handleLetterInteraction(data.index ?? null)}
             onPointerOut={() => handleLetterInteraction(null)}
           >
             <CurveText
               text={data.letter}
-              curve={data.curve}
+              curve={data.curve as THREE.CatmullRomCurve3}
               color={selectedLetter === data.index ? '#ffffff' : color}
               fontSize={selectedLetter === data.index ? fontSize * 1.1 : fontSize}
               initialOffset={data.offset}
