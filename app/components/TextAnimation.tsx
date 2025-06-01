@@ -277,10 +277,10 @@ interface AnimatedTextProps {
 const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
   text,
   handlePos = [
-    new THREE.Vector3(-4, 0.5, 0),    // Reduced vertical variation
-    new THREE.Vector3(-2, -0.5, 0.5), // Reduced depth variation
-    new THREE.Vector3(2, 0.5, -0.5),  // Reduced depth variation
-    new THREE.Vector3(4, -0.5, 0),    // Reduced vertical variation
+    new THREE.Vector3(-4, 1, 0),     // Eliminated Z variation, increased Y variation
+    new THREE.Vector3(-2, -1, 0),    // Eliminated Z variation
+    new THREE.Vector3(2, 1, 0),      // Eliminated Z variation
+    new THREE.Vector3(4, -1, 0),     // Eliminated Z variation
   ],
   color = '#00ffff',
   fontSize = 1.5,
@@ -316,13 +316,13 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
       // Add a fixed component to the offset to maintain order
       const letterOffset = (index * letterSpacing) % 1;
       
-      // Reduced variation in the dynamic curve generation
+      // Reduced variation in the dynamic curve generation with minimal Z-axis movement
       const offsetPositions = scaledHandlePos.map((pos, posIndex) => {
         const variation = selectedLetter === index ? 1.1 : 1.0;
         const offset = new THREE.Vector3(
-          Math.sin(index * 0.3) * 0.2 * variation,  // Further reduced variation
-          Math.cos(index * 0.2) * 0.15 * variation, // Further reduced variation
-          Math.sin(index * 0.25) * 0.1 * variation  // Further reduced variation
+          Math.sin(index * 0.3) * 0.25 * variation,  // Slightly increased X variation
+          Math.cos(index * 0.2) * 0.2 * variation,  // Slightly increased Y variation
+          0.01 * variation                          // Almost eliminated Z variation
         );
         return pos.clone().add(offset);
       });
