@@ -277,10 +277,10 @@ interface AnimatedTextProps {
 const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
   text,
   handlePos = [
-    new THREE.Vector3(-4, 2, 0),
-    new THREE.Vector3(-2, -2, 2),
-    new THREE.Vector3(2, 2, -2),
-    new THREE.Vector3(4, -2, 0),
+    new THREE.Vector3(-4, 0.5, 0),    // Reduced vertical variation
+    new THREE.Vector3(-2, -0.5, 0.5), // Reduced depth variation
+    new THREE.Vector3(2, 0.5, -0.5),  // Reduced depth variation
+    new THREE.Vector3(4, -0.5, 0),    // Reduced vertical variation
   ],
   color = '#00ffff',
   fontSize = 1.5,
@@ -316,11 +316,11 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
       
       // Dynamic curve generation with variation
       const offsetPositions = scaledHandlePos.map((pos, posIndex) => {
-        const variation = selectedLetter === index ? 1.5 : 1.0;
+        const variation = selectedLetter === index ? 1.2 : 1.0;
         const offset = new THREE.Vector3(
-          Math.sin(index * 0.7) * 0.7 * variation,
-          Math.cos(index * 0.5) * 0.5 * variation,
-          Math.sin(index * 0.9) * 0.8 * variation
+          Math.sin(index * 0.5) * 0.3 * variation,  // Reduced horizontal variation
+          Math.cos(index * 0.3) * 0.2 * variation,  // Reduced vertical variation
+          Math.sin(index * 0.4) * 0.2 * variation   // Reduced depth variation
         );
         return pos.clone().add(offset);
       });
