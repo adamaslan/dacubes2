@@ -16,7 +16,7 @@ import MazePage from "~/components/maze2";
 export const meta: MetaFunction = () => {
   return [
     { title: "Adam Aslan Portfolio" },
-    { name: "description", content: "Adam Aslan's Portfolio with interactive 3D cubes for navigation to other pages" },
+    { name: "description", content: "3D AI Fullstack Developer" },
   ];
 };
 
@@ -37,14 +37,14 @@ export default function Index() {
           { href: "/about", text: "About" },
           { href: "/contact", text: "Contact" }
         ]} 
-        logo={<div className="navbar-logo-text" style={{fontFamily: "'Permanent Marker', cursive"}}>Adam's Portfolio</div>} 
+        logo={<div className="navbar-logo-tetxt" style={{fontFamily: "'Permanent Marker', cursive"}}>Adam Aslan's Portfolio</div>} 
       />
       
       <div className="header-content"> {/* Changed from Tailwind classes */}
         <h1 className="main-title" style={{fontFamily: "'Permanent Marker', cursive"}}> 
-        Interactive 3D cubes for navigation to other pages
+        3D AI Fullstack Developer
         </h1>
-        <h2 className="subtitle" style={{fontFamily: "'Permanent Marker', cursive"}}>Click on the cubes!</h2>
+        <h2 className="subtitle" style={{fontFamily: "'Permanent Marker', cursive"}}>Welcome to My Portfolio</h2>
       </div>
 
       {/* Add TextAnimation component */}
@@ -60,7 +60,7 @@ export default function Index() {
         {/* <VanillaGridMaze /> */}
         {/* Comment out other components */}
         <div style={{ width: '100vw', height: '100vh', background: '#282c34' }}>
-    <TextAnimation text="Adam Aslan" />
+    <TextAnimation text="Adam  Aslan" />
   </div>
       </Suspense>
     </div>
