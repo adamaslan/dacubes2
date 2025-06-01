@@ -311,7 +311,7 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
     return letters.map((letter, index) => {
       if (letter === ' ') return { letter, skip: true };
       
-      const letterSpacing = .5 / totalLetters;
+      const letterSpacing = .375 / totalLetters; // Reduced by 25% from .5
       const letterOffset = index * letterSpacing;
       
       // Dynamic curve generation with variation
