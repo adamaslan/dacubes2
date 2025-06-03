@@ -38,7 +38,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
   
   // Enhanced texture creation with multiple layers
   const textureData = useMemo(() => {
-    const size = 256;
+    const size = 26;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
@@ -217,7 +217,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
 
         {/* Enhanced sparkles with conditional rendering */}
         <Sparkles
-          count={hovered ? 100 : 60}
+          count={hovered ? 10 : 6}
           scale={[responsiveFontSize * 3, responsiveFontSize * 3, responsiveFontSize * 3]}
           size={hovered ? 1.2 * responsiveFontSize : 0.8 * responsiveFontSize}
           speed={hovered ? 0.6 : 0.3}
@@ -494,15 +494,40 @@ const TextAnimation: React.FC<SceneProps> = ({
         
         {/* Enhanced background with Billboard particles */}
         <Billboard follow={true} lockX={false} lockY={false} lockZ={true}>
+          {/* Create multiple overlapping Sparkles with different colors */}
           <Sparkles
-            count={150}
+            count={50}
             scale={[20, 20, 20]}
-            size={0.3}
+            size={0.7}
             speed={0.05}
-            color="#ffffff"
+            color="#ff00ff" // Magenta
+            opacity={0.15}
+          />
+          <Sparkles
+            count={50}
+            scale={[20, 20, 20]}
+            size={0.65}
+            speed={0.04}
+            color="#00ffff" // Cyan
+            opacity={0.15}
+          />
+          <Sparkles
+            count={50}
+            scale={[20, 20, 20]}
+            size={0.75}
+            speed={0.06}
+            color="#ffffff" // White
             opacity={0.15}
           />
         </Billboard>
+        <Sparkles
+            count={50}
+            scale={[80, 80, 100]}
+            size={1000}
+            speed={0.1}
+            color="#ffffff"
+            opacity={0.25}
+          />
         
         {/* Floating background elements */}
         {Array.from({ length: 5 }, (_, i) => (
