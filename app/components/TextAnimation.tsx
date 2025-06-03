@@ -38,7 +38,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
   
   // Enhanced texture creation with multiple layers
   const textureData = useMemo(() => {
-    const size = 256;
+    const size = 26;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
@@ -217,7 +217,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
 
         {/* Enhanced sparkles with conditional rendering */}
         <Sparkles
-          count={hovered ? 100 : 60}
+          count={hovered ? 10 : 6}
           scale={[responsiveFontSize * 3, responsiveFontSize * 3, responsiveFontSize * 3]}
           size={hovered ? 1.2 * responsiveFontSize : 0.8 * responsiveFontSize}
           speed={hovered ? 0.6 : 0.3}
