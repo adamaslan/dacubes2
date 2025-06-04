@@ -3,15 +3,17 @@ import React, { Suspense} from "react";
 import Navbar from "~/components/navbar";
 import type {  MetaFunction } from "@remix-run/node";
 // import GridMaze from '~/components/GridMaze';
-import VanillaGridMaze from '~/components/vangrid1';
+// import VanillaGridMaze from '~/components/vangrid1';
 
-import DaCubes4 from "~/components/three4";
+// import DaCubes4 from "~/components/three4";
 import DreiNav from "~/components/DreiNav";
-import TextAnimation from "../components/TextAnimation";
+import  TextAnimation from "~/components/TextAnimation";
+import  TextAnimation3 from "~/components/TextAnimation3";
+import "../styles/three-column-grid.css"; 
 import "../styles/index-route.css";
 // import ThreeMaze from "~/components/maze1";
 // import NavigationMaze from "~/components/navigationMaze";
-import MazePage from "~/components/maze2";
+// import MazePage from "~/components/maze2";
 
 export const meta: MetaFunction = () => {
   return [
@@ -59,9 +61,35 @@ export default function Index() {
       <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> 
         {/* <VanillaGridMaze /> */}
         {/* Comment out other components */}
-        <div style={{ width: '100vw', height: '100vh', background: '#282c34' }}>
-    <TextAnimation text="Adam  Aslan" />
-  </div>
+        <div className="remix-app">
+          <Navbar
+            logo={<div className="navbar-logo-tetxt" style={{fontFamily: "'Permanent Marker', cursive"}}>Adam Aslan's Portfolio</div>}
+            links={[
+              { href: "/about", text: "About" },
+              { href: "/contact", text: "Contact" },
+              { href: "/threejs", text: "ThreeJS" },
+              { href: "/frontend", text: "Frontend" },
+            ]}
+          />
+          <div className="remix-app__main">
+            <div className="remix-app__content">
+              {/* <div style={{ width: '100vw', height: '100vh', background: '#282c34' }}> */}
+              {/*   <TextAnimation text="Adam  Aslan" /> */}
+              {/* </div> */}
+              <div className="three-canvas-grid">
+                <div style={{ width: '100%', height: '100%', background: '#282c34' }}>
+                  <TextAnimation text="Adam Aslan" />
+                </div>
+                <div style={{ width: '100%', height: '100%', background: '#282c34' }}>
+                  <TextAnimation3 text="Portfolio" />
+                </div>
+                <div style={{ width: '100%', height: '100%', background: '#eeeeee' }}>
+                  <TextAnimation text="Projects" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </Suspense>
     </div>
   );
