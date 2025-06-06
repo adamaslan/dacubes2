@@ -8,6 +8,7 @@ import VanillaGridMaze from '~/components/vangrid1';
 import DaCubes4 from "~/components/three4";
 import DreiNav from "~/components/DreiNav";
 import TextAnimation from "../components/TextAnimation";
+//  import  TextAnimation2 from "../components/TextAnimation1b";
 import "../styles/index-route.css";
 // import ThreeMaze from "~/components/maze1";
 // import NavigationMaze from "~/components/navigationMaze";
@@ -89,6 +90,7 @@ export default function Index() {
             <TextAnimation text="ThreeJS" />
           </a>
         </div>
+        {/* <TextAnimation2 text="ThreeJS" /> */}
       </Suspense>
     </div>
   );
