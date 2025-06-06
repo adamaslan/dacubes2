@@ -2,7 +2,6 @@
 /* Basic CSS Reset (inspired by Tailwind's Preflight and common resets) */
 html {
   line-height: 1.5; /* Default line height */
-  -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape */
   tab-size: 4; /* Consistent tab size */
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* Default font stack */
 }
