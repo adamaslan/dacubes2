@@ -59,13 +59,36 @@ export default function Index() {
       <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> 
         {/* <VanillaGridMaze /> */}
         {/* Comment out other components */}
-        <div style={{ width: '100vw', height: '100vh', background: '#282c34' }}>
-        <a href="/frontend">  <TextAnimation text="Frontend" />
-        </a>
-    <a href="/threejs">
-      <TextAnimation text="ThreeJS" />
-    </a>
-  </div>
+        <div style={{ 
+          width: '100vw', 
+          height: '100vh', 
+          background: '#ff69b4',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 45vw)',
+          gap: '2vw',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '2vw'
+        }}>
+          <a href="/frontend" style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <TextAnimation text="Frontend" />
+          </a>
+          <a href="/threejs" style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <TextAnimation text="ThreeJS" />
+          </a>
+        </div>
       </Suspense>
     </div>
   );
