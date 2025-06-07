@@ -24,7 +24,7 @@ export default function AIProjects() {
       <Navbar links={navLinks} logo={logo} />
       
       <main className="threejs-main">
-        <h1 className="threejs-title">GitHub Projects</h1>
+        <h1 className="threejs-title">ThreeJS and React 3 Fiber Examples</h1>
         
         <div className="threejs-grid">
           <a href="https://github.com/yourusername/project1" 
@@ -32,8 +32,24 @@ export default function AIProjects() {
             <div className="threejs-card-content">
               <h2 className="threejs-card-title">GitHub 1</h2>
               <p className="threejs-card-text">React Project Repository</p>
-              <p className="threejs-card-subtext">Click to view source code</p>
-              // move here
+              {/* <p className="threejs-card-subtext">Click to view source code</p> */}
+              <video autoPlay loop muted>
+                <source src="/zxy4.mov" type="video/mp4" />
+                Your browser does not support the video tag.
+        </video>
+            </div>
+          </a>
+          <a href="https://github.com/yourusername/project1" 
+             className="threejs-card threejs-card-blue">
+            <div className="threejs-card-content">
+              <h2 className="threejs-card-title">GitHub 1</h2>
+              <p className="threejs-card-text">React Project Repository</p>
+              {/* <p className="threejs-card-subtext">Click to view source code</p> */}
+         
+              <video autoPlay loop muted>
+                <source src="/sound1.mov" type="video/mp4" />
+                Your browser does not support the video tag.
+        </video>
             </div>
           </a>
           <a href="https://github.com/yourusername/project1" 
@@ -42,14 +58,24 @@ export default function AIProjects() {
               <h2 className="threejs-card-title">GitHub 1</h2>
               <p className="threejs-card-text">React Project Repository</p>
               <p className="threejs-card-subtext">Click to view source code</p>
-         
               <video autoPlay loop muted>
-                <source src="/sound1.mov" type="video/mp4" />
+                <source src="/nycpony.mov" type="video/mp4" />
                 Your browser does not support the video tag.
         </video>
             </div>
           </a>
-
+          <a href="https://github.com/yourusername/project1" 
+             className="threejs-card threejs-card-blue">
+            <div className="threejs-card-content">
+              <h2 className="threejs-card-title">GitHub 1</h2>
+              <p className="threejs-card-text">React Project Repository</p>
+              <p className="threejs-card-subtext">Click to view source code</p>
+              <video autoPlay loop muted>
+                <source src="/stars1.mov" type="video/mp4" />
+                Your browser does not support the video tag.
+        </video>
+            </div>
+          </a>
           {/* Repeat for other cards with appropriate color classes */}
         </div>
       </main>
