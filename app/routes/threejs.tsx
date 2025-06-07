@@ -5,8 +5,8 @@ import "../styles/threejs.css";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "GitHub Projects" },
-    { name: "description", content: "Explore our GitHub projects" },
+    { title: "ThreeJS and React 3 Fiber Projects" },
+    { name: "description", content: "Explore ThreeJS and React 3 Fiber projects" },
   ];
 };
 

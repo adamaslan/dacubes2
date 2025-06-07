@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
 import Navbar from "~/components/navbar";
-import "./frontend.css";
+import "../styles/frontend.css";
 
 export const meta: MetaFunction = () => {
   return [
