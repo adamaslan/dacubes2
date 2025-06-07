@@ -78,7 +78,13 @@ export default function Index() {
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-            <TextAnimation text="Frontend" />
+           <TextAnimation 
+  text="WAVES" 
+  backgroundEffect="waves"
+  backgroundIntensity={1.2}
+  primaryColor="#ff6b6b"
+  secondaryColor="#4ecdc4"
+/>
           </a>
           <a href="/threejs" style={{
             width: '100%',
@@ -87,7 +93,13 @@ export default function Index() {
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-            <TextAnimation text="ThreeJS" />
+    <TextAnimation 
+  text="ThreeJS" 
+  backgroundEffect="grid"
+  backgroundIntensity={1}
+  primaryColor="#00ffff"
+  secondaryColor="#ff00ff"
+/>
           </a>
         </div>
         {/* <TextAnimation2 text="ThreeJS" /> */}

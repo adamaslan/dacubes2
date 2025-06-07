@@ -265,6 +265,304 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
 
 CurveText.displayName = 'CurveText';
 
+// Background Effects Components
+interface BackgroundEffectProps {
+  intensity?: number;
+  color?: string;
+  secondaryColor?: string;
+}
+
+// Matrix Rain Effect
+const MatrixRain: React.FC<BackgroundEffectProps> = ({ 
+  intensity = 1, 
+  color = '#00ff00',
+  secondaryColor = '#004400'
+}) => {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const { viewport } = useThree();
+  
+  const count = Math.floor(50 * intensity);
+  const positions = useMemo(() => {
+    const pos = [];
+    for (let i = 0; i < count; i++) {
+      pos.push([
+        (Math.random() - 0.5) * viewport.width * 2,
+        Math.random() * viewport.height * 2,
+        (Math.random() - 0.5) * 20
+      ]);
+    }
+    return pos;
+  }, [count, viewport]);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    
+    const time = state.clock.elapsedTime;
+    positions.forEach((pos, i) => {
+      const matrix = new THREE.Matrix4();
+      pos[1] -= 0.1 * intensity;
+      if (pos[1] < -viewport.height) pos[1] = viewport.height;
+      
+      matrix.setPosition(pos[0], pos[1], pos[2]);
+      matrix.scale(new THREE.Vector3(0.1, Math.random() * 2 + 1, 0.1));
+      meshRef.current!.setMatrixAt(i, matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <boxGeometry args={[0.1, 1, 0.1]} />
+      <meshBasicMaterial color={color} transparent opacity={0.6} />
+    </instancedMesh>
+  );
+};
+
+// Neural Network Effect
+const NeuralNetwork: React.FC<BackgroundEffectProps> = ({ 
+  intensity = 1, 
+  color = '#00ffff',
+  secondaryColor = '#ff00ff'
+}) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const { viewport } = useThree();
+  
+  const nodeCount = Math.floor(20 * intensity);
+  const nodes = useMemo(() => {
+    return Array.from({ length: nodeCount }, () => ({
+      position: new THREE.Vector3(
+        (Math.random() - 0.5) * viewport.width * 1.5,
+        (Math.random() - 0.5) * viewport.height * 1.5,
+        (Math.random() - 0.5) * 15
+      ),
+      connections: []
+    }));
+  }, [nodeCount, viewport]);
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const time = state.clock.elapsedTime;
+    
+    nodes.forEach((node, i) => {
+      const pulse = Math.sin(time * 2 + i) * 0.5 + 0.5;
+      node.position.x += Math.sin(time * 0.5 + i) * 0.01;
+      node.position.y += Math.cos(time * 0.3 + i) * 0.01;
+    });
+  });
+
+  return (
+    <group ref={groupRef}>
+      {nodes.map((node, i) => (
+        <group key={i}>
+          <mesh position={node.position}>
+            <sphereGeometry args={[0.05, 8, 8]} />
+            <meshBasicMaterial color={color} />
+          </mesh>
+          {nodes.slice(i + 1).map((otherNode, j) => {
+            const distance = node.position.distanceTo(otherNode.position);
+            if (distance < 3) {
+              const points = [node.position, otherNode.position];
+              return (
+                <line key={`${i}-${j}`}>
+                  <bufferGeometry>
+                    <bufferAttribute
+                      attach="attributes-position"
+                      count={points.length}
+                      array={new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))}
+                      itemSize={3}
+                    />
+                  </bufferGeometry>
+                  <lineBasicMaterial 
+                    color={secondaryColor} 
+                    opacity={0.3 * (1 - distance / 3)} 
+                    transparent 
+                  />
+                </line>
+              );
+            }
+            return null;
+          })}
+        </group>
+      ))}
+    </group>
+  );
+};
+
+// Geometric Waves Effect
+const GeometricWaves: React.FC<BackgroundEffectProps> = ({ 
+  intensity = 1, 
+  color = '#ff6b6b',
+  secondaryColor = '#4ecdc4'
+}) => {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const { viewport } = useThree();
+  
+  const count = Math.floor(100 * intensity);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    
+    const time = state.clock.elapsedTime;
+    
+    for (let i = 0; i < count; i++) {
+      const x = (i % 10 - 4.5) * 2;
+      const z = (Math.floor(i / 10) - 5) * 2;
+      const y = Math.sin(x * 0.5 + time) * Math.cos(z * 0.5 + time) * 2;
+      
+      dummy.position.set(x, y, z);
+      dummy.rotation.x = time + i * 0.1;
+      dummy.rotation.y = time * 0.5 + i * 0.05;
+      dummy.scale.setScalar(0.5 + Math.sin(time + i) * 0.3);
+      dummy.updateMatrix();
+      
+      meshRef.current.setMatrixAt(i, dummy.matrix);
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <octahedronGeometry args={[0.2]} />
+      <meshPhongMaterial color={color} transparent opacity={0.7} />
+    </instancedMesh>
+  );
+};
+
+// Particle Flow Effect
+const ParticleFlow: React.FC<BackgroundEffectProps> = ({ 
+  intensity = 1, 
+  color = '#ffd93d',
+  secondaryColor = '#ff6b9d'
+}) => {
+  const pointsRef = useRef<THREE.Points>(null);
+  const { viewport } = useThree();
+  
+  const particleCount = Math.floor(1000 * intensity);
+  
+  const [positions, velocities] = useMemo(() => {
+    const pos = new Float32Array(particleCount * 3);
+    const vel = new Float32Array(particleCount * 3);
+    
+    for (let i = 0; i < particleCount; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * viewport.width * 2;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * viewport.height * 2;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      
+      vel[i * 3] = (Math.random() - 0.5) * 0.02;
+      vel[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+    }
+    
+    return [pos, vel];
+  }, [particleCount, viewport]);
+
+  useFrame(() => {
+    if (!pointsRef.current) return;
+    
+    const positionAttribute = pointsRef.current.geometry.attributes.position;
+    
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] += velocities[i * 3];
+      positions[i * 3 + 1] += velocities[i * 3 + 1];
+      positions[i * 3 + 2] += velocities[i * 3 + 2];
+      
+      // Reset particles that go too far
+      if (Math.abs(positions[i * 3]) > viewport.width) {
+        positions[i * 3] = (Math.random() - 0.5) * viewport.width * 2;
+        velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+      }
+      if (Math.abs(positions[i * 3 + 1]) > viewport.height) {
+        positions[i * 3 + 1] = (Math.random() - 0.5) * viewport.height * 2;
+        velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+      }
+    }
+    
+    positionAttribute.needsUpdate = true;
+  });
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={particleCount}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        color={color}
+        size={0.05}
+        transparent
+        opacity={0.6}
+        sizeAttenuation={true}
+      />
+    </points>
+  );
+};
+
+// Holographic Grid Effect
+const HolographicGrid: React.FC<BackgroundEffectProps> = ({ 
+  intensity = 1, 
+  color = '#00ffff',
+  secondaryColor = '#ff00ff'
+}) => {
+  const gridRef = useRef<THREE.Group>(null);
+  const { viewport } = useThree();
+  
+  const gridSize = Math.floor(20 * intensity);
+  
+  useFrame((state) => {
+    if (!gridRef.current) return;
+    
+    const time = state.clock.elapsedTime;
+    gridRef.current.rotation.x = Math.sin(time * 0.2) * 0.1;
+    gridRef.current.rotation.y = time * 0.1;
+    gridRef.current.position.y = Math.sin(time * 0.5) * 2;
+  });
+
+  return (
+    <group ref={gridRef}>
+      {/* Horizontal lines */}
+      {Array.from({ length: gridSize }, (_, i) => (
+        <line key={`h-${i}`}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              count={2}
+              array={new Float32Array([
+                -viewport.width, (i - gridSize/2) * 0.5, -5,
+                viewport.width, (i - gridSize/2) * 0.5, -5
+              ])}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial color={color} opacity={0.3} transparent />
+        </line>
+      ))}
+      
+      {/* Vertical lines */}
+      {Array.from({ length: gridSize }, (_, i) => (
+        <line key={`v-${i}`}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              count={2}
+              array={new Float32Array([
+                (i - gridSize/2) * 0.5, -viewport.height, -5,
+                (i - gridSize/2) * 0.5, viewport.height, -5
+              ])}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial color={secondaryColor} opacity={0.3} transparent />
+        </line>
+      ))}
+    </group>
+  );
+};
+
 interface AnimatedTextProps {
   text: string;
   handlePos?: THREE.Vector3[];
@@ -277,10 +575,10 @@ interface AnimatedTextProps {
 const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
   text,
   handlePos = [
-    new THREE.Vector3(-4, 1, 0),     // Eliminated Z variation, increased Y variation
-    new THREE.Vector3(-2, -1, 0),    // Eliminated Z variation
-    new THREE.Vector3(2, 1, 0),      // Eliminated Z variation
-    new THREE.Vector3(4, -1, 0),     // Eliminated Z variation
+    new THREE.Vector3(-4, 1, 0),
+    new THREE.Vector3(-2, -1, 0),
+    new THREE.Vector3(2, 1, 0),
+    new THREE.Vector3(4, -1, 0),
   ],
   color = '#00ffff',
   fontSize = 1.5,
@@ -290,19 +588,16 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
   const { viewport } = useThree();
   const [selectedLetter, setSelectedLetter] = useState<number | null>(null);
   
-  // Responsive curve scaling
   const scaledHandlePos = useMemo(() => {
     const scale = Math.min(viewport.width / 8, viewport.height / 8, 1);
     return handlePos.map(pos => pos.clone().multiplyScalar(scale));
   }, [handlePos, viewport.width, viewport.height]);
 
-  // Create main curve
   const curve = useMemo(() => 
     new THREE.CatmullRomCurve3(scaledHandlePos, true, 'centripetal'), 
     [scaledHandlePos]
   );
 
-  // Enhanced letter processing with interactive features
   const letterData = useMemo(() => {
     const letters = text.split('');
     const nonSpaceLetters = letters.filter(letter => letter !== ' ');
@@ -311,18 +606,15 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
     return letters.map((letter, index) => {
       if (letter === ' ') return { letter, skip: true };
       
-      // Fixed spacing ensures letters maintain their order
-      const letterSpacing = .375 / totalLetters; // Reduced by 25% from .5
-      // Add a fixed component to the offset to maintain order
+      const letterSpacing = .375 / totalLetters;
       const letterOffset = (index * letterSpacing) % 1;
       
-      // Reduced variation in the dynamic curve generation with minimal Z-axis movement
       const offsetPositions = scaledHandlePos.map((pos, posIndex) => {
         const variation = selectedLetter === index ? 1.1 : 1.0;
         const offset = new THREE.Vector3(
-          Math.sin(index * 0.3) * 0.25 * variation,  // Slightly increased X variation
-          Math.cos(index * 0.2) * 0.2 * variation,  // Slightly increased Y variation
-          0.01 * variation                          // Almost eliminated Z variation
+          Math.sin(index * 0.3) * 0.25 * variation,
+          Math.cos(index * 0.2) * 0.2 * variation,
+          0.01 * variation
         );
         return pos.clone().add(offset);
       });
@@ -337,12 +629,10 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
     });
   }, [text, scaledHandlePos, selectedLetter]);
 
-  // Interactive curve visualization
   const curveVisualization = useMemo(() => {
     const points = curve.getPoints(40);
     return (
       <>
-        {/* Main curve */}
         <line>
           <bufferGeometry>
             <bufferAttribute
@@ -359,7 +649,6 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
           />
         </line>
         
-        {/* Control points */}
         {scaledHandlePos.map((pos, index) => (
           <Billboard key={index} follow={true} lockX={false} lockY={false} lockZ={true}>
             <mesh position={pos}>
@@ -412,16 +701,34 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
 
 AnimatedText.displayName = 'AnimatedText';
 
+// Background Effect Types
+export type BackgroundEffect = 
+  | 'sparkles' 
+  | 'matrix' 
+  | 'neural' 
+  | 'waves' 
+  | 'particles' 
+  | 'grid' 
+  | 'none';
+
 interface SceneProps {
   text: string;
   billboardMode?: 'full' | 'horizontal' | 'vertical' | 'none';
   interactiveMode?: boolean;
+  backgroundEffect?: BackgroundEffect;
+  backgroundIntensity?: number;
+  primaryColor?: string;
+  secondaryColor?: string;
 }
 
 const TextAnimation: React.FC<SceneProps> = ({ 
   text = "FLOWING",
   billboardMode = 'horizontal',
-  interactiveMode = true
+  interactiveMode = true,
+  backgroundEffect = 'neural',
+  backgroundIntensity = 1,
+  primaryColor = '#00ffff',
+  secondaryColor = '#ff00ff'
 }) => {
   // Enhanced lighting with shadows
   const lightingSetup = useMemo(() => (
@@ -442,7 +749,7 @@ const TextAnimation: React.FC<SceneProps> = ({
       <pointLight 
         position={[-8, -8, -8]} 
         intensity={0.6} 
-        color="#00ffff" 
+        color={primaryColor} 
         distance={25}
         decay={2}
       />
@@ -451,7 +758,7 @@ const TextAnimation: React.FC<SceneProps> = ({
         angle={0.5} 
         penumbra={0.9} 
         intensity={0.8}
-        color="#ff00ff"
+        color={secondaryColor}
         distance={20}
         decay={2}
         castShadow
@@ -464,7 +771,53 @@ const TextAnimation: React.FC<SceneProps> = ({
         intensity={0.2}
       />
     </>
-  ), []);
+  ), [primaryColor, secondaryColor]);
+
+  // Background effect renderer
+  const renderBackgroundEffect = () => {
+    const props = {
+      intensity: backgroundIntensity,
+      color: primaryColor,
+      secondaryColor: secondaryColor
+    };
+
+    switch (backgroundEffect) {
+      case 'matrix':
+        return <MatrixRain {...props} />;
+      case 'neural':
+        return <NeuralNetwork {...props} />;
+      case 'waves':
+        return <GeometricWaves {...props} />;
+      case 'particles':
+        return <ParticleFlow {...props} />;
+      case 'grid':
+        return <HolographicGrid {...props} />;
+      case 'sparkles':
+        return (
+          <Billboard follow={true} lockX={false} lockY={false} lockZ={true}>
+            <Sparkles
+              count={50 * backgroundIntensity}
+              scale={[20, 20, 20]}
+              size={0.7}
+              speed={0.05}
+              color={primaryColor}
+              opacity={0.15}
+            />
+            <Sparkles
+              count={50 * backgroundIntensity}
+              scale={[20, 20, 20]}
+              size={0.65}
+              speed={0.04}
+              color={secondaryColor}
+              opacity={0.15}
+            />
+          </Billboard>
+        );
+      case 'none':
+      default:
+        return null;
+    }
+  };
 
   return (
     <div style={{ 
@@ -490,63 +843,12 @@ const TextAnimation: React.FC<SceneProps> = ({
           text={text} 
           billboardMode={billboardMode}
           interactiveMode={interactiveMode}
+          color={primaryColor}
         />
         
-        {/* Enhanced background with Billboard particles */}
-        <Billboard follow={true} lockX={false} lockY={false} lockZ={true}>
-          {/* Create multiple overlapping Sparkles with different colors */}
-          <Sparkles
-            count={50}
-            scale={[20, 20, 20]}
-            size={0.7}
-            speed={0.05}
-            color="#ff00ff" // Magenta
-            opacity={0.15}
-          />
-          <Sparkles
-            count={50}
-            scale={[20, 20, 20]}
-            size={0.65}
-            speed={0.04}
-            color="#00ffff" // Cyan
-            opacity={0.15}
-          />
-          <Sparkles
-            count={50}
-            scale={[20, 20, 20]}
-            size={0.75}
-            speed={0.06}
-            color="#ffffff" // White
-            opacity={0.15}
-          />
-        </Billboard>
-        <Sparkles
-            count={50}
-            scale={[80, 80, 100]}
-            size={1000}
-            speed={0.1}
-            color="#ffffff"
-            opacity={0.25}
-          />
+        {/* Dynamic background effect */}
+        {renderBackgroundEffect()}
         
-        {/* Floating background elements */}
-        {Array.from({ length: 5 }, (_, i) => (
-          <Billboard key={i} follow={true} lockX={true} lockY={false} lockZ={false}>
-            <mesh position={[
-              (Math.random() - 0.5) * 20,
-              (Math.random() - 0.5) * 15,
-              (Math.random() - 0.5) * 10
-            ]}>
-              <ringGeometry args={[0.5, 0.8, 16]} />
-              <meshBasicMaterial 
-                color="#00ffff" 
-                opacity={0.1} 
-                transparent 
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </Billboard>
-        ))}
       </Canvas>
       
       {/* UI Controls */}
@@ -564,6 +866,8 @@ const TextAnimation: React.FC<SceneProps> = ({
           pointerEvents: 'none'
         }}>
           Billboard Mode: {billboardMode}<br/>
+          Background: {backgroundEffect}<br/>
+          Intensity: {backgroundIntensity}<br/>
           Interactive: {interactiveMode ? 'ON' : 'OFF'}<br/>
           Hover letters for effects
         </div>
