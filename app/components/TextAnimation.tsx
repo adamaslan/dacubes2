@@ -392,6 +392,8 @@ const NeuralNetwork: React.FC<BackgroundEffectProps> = ({
 const GeometricWaves: React.FC<BackgroundEffectProps> = ({ 
   intensity = 1, 
   color = '#ff6b6b',
+  // This secondary color can be customized when using the GeometricWaves component:
+  // Example: <GeometricWaves secondaryColor="#ff0000" />
   secondaryColor = '#4ecdc4'
 }) => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -424,7 +426,12 @@ const GeometricWaves: React.FC<BackgroundEffectProps> = ({
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <octahedronGeometry args={[0.2]} />
-      <meshPhongMaterial color={color} transparent opacity={0.7} />
+      <meshPhongMaterial 
+        color={color as THREE.ColorRepresentation} 
+        // Remove secondaryColor as it's not a valid property of MeshPhongMaterial
+        transparent 
+        opacity={0.7} 
+      />
     </instancedMesh>
   );
 };
@@ -493,6 +500,7 @@ const ParticleFlow: React.FC<BackgroundEffectProps> = ({
       </bufferGeometry>
       <pointsMaterial
         color={color}
+       
         size={0.05}
         transparent
         opacity={0.6}
