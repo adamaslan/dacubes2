@@ -17,7 +17,20 @@ import MazePage from "~/components/maze2";
 export const meta: MetaFunction = () => {
   return [
     { title: "Adam Aslan Portfolio" },
-    { name: "description", content: "3D AI Fullstack Developer" },
+    { name: "description", content: "3D AI Fullstack Developer - Welcome to my portfolio showcasing various projects including ThreeJS and AI work." },
+    // General Open Graph tags for the portfolio
+    { property: "og:title", content: "Adam Aslan Portfolio" },
+    { property: "og:description", content: "Explore the 3D, AI, and Fullstack development portfolio of Adam Aslan." },
+    { property: "og:type", content: "website" },
+    // Optional: Add an image representing your portfolio for og:image
+    // { property: "og:image", content: "/path/to/your-portfolio-preview-image.jpg" }, // Absolute URL when deployed
+
+    // Optional: If you want to specifically highlight /sound1.mov when sharing the main page URL
+    // You might choose to omit these if the video isn't a central piece of the homepage
+    { property: "og:video", content: "/sound1.mov" }, // Absolute URL needed when deployed: e.g., https://yourdomain.com/sound1.mov
+    { property: "og:video:type", content: "video/mp4" },
+    // { property: "og:video:width", content: "1280" },
+    // { property: "og:video:height", content: "720" },
   ];
 };
 
@@ -79,8 +92,8 @@ export default function Index() {
             alignItems: 'center'
           }}>
            <TextAnimation 
-  text="WAVES" 
-  backgroundEffect="waves"
+  text="Frontend" 
+  // effect="waves"
   backgroundIntensity={1.2}
   primaryColor="#ff6b6b"
   secondaryColor="#4ecdc4"
