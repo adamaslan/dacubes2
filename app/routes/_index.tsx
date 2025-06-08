@@ -93,7 +93,7 @@ export default function Index() {
           }}>
            <TextAnimation 
   text="Frontend" 
-  // effect="waves"
+  effect="waves"
   backgroundIntensity={1.2}
   primaryColor="#ff6b6b"
   secondaryColor="#4ecdc4"
