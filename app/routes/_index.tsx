@@ -95,7 +95,7 @@ export default function Index() {
   text="Frontend" 
   backgroundEffect="waves"
   backgroundIntensity={1.2}
-  primaryColor="#ff6b6b"
+  primaryColor="#800080"
   secondaryColor="#4ecdc4"
 />
           </a>
@@ -110,8 +110,8 @@ export default function Index() {
   text="ThreeJS" 
   backgroundEffect="grid"
   backgroundIntensity={1}
-  primaryColor="#00ffff"
-  secondaryColor="#ff00ff"
+  primaryColor="#00f2f2"
+  secondaryColor="#ffffff"
 />
           </a>
         </div>

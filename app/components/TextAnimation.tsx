@@ -391,7 +391,7 @@ const NeuralNetwork: React.FC<BackgroundEffectProps> = ({
 // Geometric Waves Effect
 const GeometricWaves: React.FC<BackgroundEffectProps> = ({ 
   intensity = 1, 
-  color = '#ff6b6b',
+  color = '#ffffff',
   // This secondary color can be customized when using the GeometricWaves component:
   // Example: <GeometricWaves secondaryColor="#ff0000" />
   secondaryColor = '#4ecdc4'
@@ -410,11 +410,11 @@ const GeometricWaves: React.FC<BackgroundEffectProps> = ({
     for (let i = 0; i < count; i++) {
       const x = (i % 10 - 4.5) * 2;
       const z = (Math.floor(i / 10) - 5) * 2;
-      const y = Math.sin(x * 0.5 + time) * Math.cos(z * 0.5 + time) * 2;
+      const y = Math.sin(x * 0.5 + time) * Math.cos(z * 0.5 + time) * 3;
       
       dummy.position.set(x, y, z);
       dummy.rotation.x = time + i * 0.1;
-      dummy.rotation.y = time * 0.5 + i * 0.05;
+      dummy.rotation.y = time * 0.5 + i * 0.02;
       dummy.scale.setScalar(0.5 + Math.sin(time + i) * 0.3);
       dummy.updateMatrix();
       
@@ -430,7 +430,7 @@ const GeometricWaves: React.FC<BackgroundEffectProps> = ({
         color={color as THREE.ColorRepresentation} 
         // Remove secondaryColor as it's not a valid property of MeshPhongMaterial
         transparent 
-        opacity={0.7} 
+        opacity={0.5} 
       />
     </instancedMesh>
   );
@@ -863,7 +863,7 @@ const TextAnimation: React.FC<SceneProps> = ({
       {interactiveMode && (
         <div style={{
           position: 'absolute',
-          top: '20px',
+          top: '50px',
           left: '20px',
           color: '#ffffff',
           fontFamily: 'monospace',
