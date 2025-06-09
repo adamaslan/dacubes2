@@ -34,13 +34,17 @@ const Navbar: React.FC<NavbarProps> = ({ links, logo }) => {
   return (
     <nav className={navClasses}>
       <div className="navbar-container">
-        {logo && React.cloneElement(logo, { 
-          // Remove Tailwind classes that are now handled by navbar.css for the logo
-          className: `${(logo.props.className || '')
-            .replace(/\btext-\S+\b/g, '') // Remove text color utilities
-            .replace(/\bfont-(bold|medium|semibold)\b/g, '') // Remove font weight utilities
-            .trim()} navbar-logo`
-        })}
+        {logo && (
+          <a href="/" className="navbar-logo-link">
+            {React.cloneElement(logo, {
+              // Remove Tailwind classes that are now handled by navbar.css for the logo
+              className: `${(logo.props.className || '')
+                .replace(/\btext-\S+\b/g, '') // Remove text color utilities
+                .replace(/\bfont-(bold|medium|semibold)\b/g, '') // Remove font weight utilities
+                .trim()} navbar-logo`
+            })}
+          </a>
+        )}
         
         <ul className="navbar-links-list">
           {links.map((link) => (
