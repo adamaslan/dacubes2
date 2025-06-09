@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text, Float, Sparkles, useScroll, Billboard, Html, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Enhanced CurveText component with Billboard integration
+// Enhanced CurveText component with comprehensive Billboard integration
 interface CurveTextProps {
   text: string;
   curve: THREE.CatmullRomCurve3;
@@ -11,6 +11,7 @@ interface CurveTextProps {
   fontSize?: number;
   initialOffset?: number;
   billboardMode?: 'full' | 'horizontal' | 'vertical' | 'none';
+  letterIndex?: number;
 }
 
 const CurveText: React.FC<CurveTextProps> = React.memo(({
@@ -19,7 +20,8 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
   color = 'white',
   fontSize = 1,
   initialOffset = 0,
-  billboardMode = 'horizontal'
+  billboardMode = 'horizontal',
+  letterIndex = 0
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const billboardRef = useRef<THREE.Group>(null);
@@ -27,6 +29,19 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
   const pathOffset = useRef(initialOffset);
   const { viewport, camera } = useThree();
   const [hovered, setHovered] = useState(false);
+  const [debugInfo, setDebugInfo] = useState({
+    position: new THREE.Vector3(),
+    rotation: new THREE.Euler(),
+    tangent: new THREE.Vector3(),
+    pathProgress: 0,
+    speed: 0,
+    floatOffset: { x: 0, y: 0 },
+    scale: 1,
+    billboardRotation: new THREE.Euler(),
+    distanceFromCamera: 0,
+    curvature: 0,
+    animationPhase: 0
+  });
   
   // Responsive font size with hover effect
   const responsiveFontSize = useMemo(() => {
@@ -75,23 +90,32 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
     return texture;
   }, []);
 
-  // Advanced animation with easing
+  // Advanced animation with comprehensive debugging
   useFrame((state, delta) => {
     if (!groupRef.current) return;
 
     const time = state.clock.elapsedTime;
     
-    // Reduced movement speed by 75% for more stable letter positioning
-    pathOffset.current += delta * (0.02 + Math.sin(time * 0.3) * 0.005);
+    // Calculate movement and speed
+    const baseSpeed = 0.02;
+    const oscillation = Math.sin(time * 0.3) * 0.005;
+    const currentSpeed = baseSpeed + oscillation;
+    pathOffset.current += delta * currentSpeed;
     
     const scrollInfluence = scroll ? scroll.offset * 0.4 : 0;
     const totalOffset = (pathOffset.current + scrollInfluence + initialOffset) % 1;
     
-    // Get position and tangent
+    // Get position and tangent from curve
     const position = curve.getPoint(totalOffset);
     const tangent = curve.getTangent(totalOffset);
     
-    // Reduced floating motion by 50% for more stability
+    // Calculate curvature (second derivative approximation)
+    const epsilon = 0.001;
+    const point1 = curve.getPoint(Math.max(0, totalOffset - epsilon));
+    const point2 = curve.getPoint(Math.min(1, totalOffset + epsilon));
+    const curvature = point1.distanceTo(point2) / (2 * epsilon);
+    
+    // Calculate floating motion
     const floatY = Math.sin(time * 1.2 + initialOffset * 10) * 0.05;
     const floatX = Math.cos(time * 0.8 + initialOffset * 8) * 0.025;
     
@@ -100,12 +124,36 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
     
     groupRef.current.position.copy(position);
     
-    // Conditional orientation based on billboard mode
+    // Calculate distance from camera
+    const distanceFromCamera = camera.position.distanceTo(position);
+    
+    // Update rotation based on billboard mode
+    let billboardRotation = new THREE.Euler();
     if (billboardMode === 'none') {
       const lookAtTarget = position.clone().add(tangent);
       groupRef.current.lookAt(lookAtTarget);
       groupRef.current.rotation.z += delta * 0.3;
+    } else if (billboardRef.current) {
+      billboardRotation = billboardRef.current.rotation.clone();
     }
+    
+    // Calculate animation phase
+    const animationPhase = (Math.sin(time + letterIndex * 0.5) + 1) / 2;
+    
+    // Update debug information
+    setDebugInfo({
+      position: position.clone(),
+      rotation: groupRef.current.rotation.clone(),
+      tangent: tangent.clone(),
+      pathProgress: totalOffset,
+      speed: currentSpeed,
+      floatOffset: { x: floatX, y: floatY },
+      scale: responsiveFontSize,
+      billboardRotation,
+      distanceFromCamera,
+      curvature,
+      animationPhase
+    });
   });
 
   // Billboard configuration based on mode
@@ -225,23 +273,104 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
           opacity={hovered ? 0.8 : 0.6}
         />
 
-        {/* HTML overlay for debug info when hovered */}
+        {/* Comprehensive HTML overlay with detailed information */}
         {hovered && (
           <Html
-            position={[0, responsiveFontSize + 0.5, 0]}
+            position={[0, responsiveFontSize + 0.8, 0]}
             center
-            distanceFactor={8}
+            distanceFactor={6}
             style={{
-              color: color,
-              fontSize: '12px',
-              fontFamily: 'monospace',
-              background: 'rgba(0,0,0,0.5)',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              pointerEvents: 'none'
+              color: '#ffffff',
+              fontSize: '11px',
+              fontFamily: 'Monaco, Consolas, monospace',
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.9), rgba(20,20,40,0.9))',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              border: `1px solid ${color}`,
+              boxShadow: `0 0 20px ${color}40`,
+              pointerEvents: 'none',
+              minWidth: '280px',
+              backdropFilter: 'blur(10px)'
             }}
           >
-            {text} • Mode: {billboardMode}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <div>
+                <div style={{ color: color, fontWeight: 'bold', marginBottom: '6px' }}>
+                  📍 LETTER: "{text}" [#{letterIndex}]
+                </div>
+                
+                <div style={{ marginBottom: '4px', color: '#8cc8ff' }}>
+                  📊 POSITION & MOVEMENT
+                </div>
+                <div style={{ fontSize: '10px', lineHeight: '1.3', marginBottom: '6px' }}>
+                  X: {debugInfo.position.x.toFixed(3)}<br/>
+                  Y: {debugInfo.position.y.toFixed(3)}<br/>
+                  Z: {debugInfo.position.z.toFixed(3)}<br/>
+                  Speed: {debugInfo.speed.toFixed(4)} u/s
+                </div>
+
+                <div style={{ marginBottom: '4px', color: '#ff8c94' }}>
+                  🎯 CURVE DYNAMICS
+                </div>
+                <div style={{ fontSize: '10px', lineHeight: '1.3', marginBottom: '6px' }}>
+                  Progress: {(debugInfo.pathProgress * 100).toFixed(1)}%<br/>
+                  Curvature: {debugInfo.curvature.toFixed(4)}<br/>
+                  Tangent X: {debugInfo.tangent.x.toFixed(3)}<br/>
+                  Tangent Y: {debugInfo.tangent.y.toFixed(3)}
+                </div>
+
+                <div style={{ marginBottom: '4px', color: '#a8e6cf' }}>
+                  🌊 FLOAT ANIMATION
+                </div>
+                <div style={{ fontSize: '10px', lineHeight: '1.3' }}>
+                  Float X: {debugInfo.floatOffset.x.toFixed(4)}<br/>
+                  Float Y: {debugInfo.floatOffset.y.toFixed(4)}<br/>
+                  Phase: {(debugInfo.animationPhase * 100).toFixed(1)}%
+                </div>
+              </div>
+
+              <div>
+                <div style={{ marginBottom: '4px', color: '#ffd93d' }}>
+                  🎨 RENDERING
+                </div>
+                <div style={{ fontSize: '10px', lineHeight: '1.3', marginBottom: '6px' }}>
+                  Scale: {debugInfo.scale.toFixed(3)}<br/>
+                  Distance: {debugInfo.distanceFromCamera.toFixed(2)}<br/>
+                  Billboard: {billboardMode}<br/>
+                  Layers: 4 (shadow/mid/main/rim)
+                </div>
+
+                <div style={{ marginBottom: '4px', color: '#dda0dd' }}>
+                  🔄 ROTATION
+                </div>
+                <div style={{ fontSize: '10px', lineHeight: '1.3', marginBottom: '6px' }}>
+                  X: {(debugInfo.rotation.x * 180 / Math.PI).toFixed(1)}°<br/>
+                  Y: {(debugInfo.rotation.y * 180 / Math.PI).toFixed(1)}°<br/>
+                  Z: {(debugInfo.rotation.z * 180 / Math.PI).toFixed(1)}°
+                </div>
+
+                <div style={{ marginBottom: '4px', color: '#98fb98' }}>
+                  ⚡ PERFORMANCE
+                </div>
+                <div style={{ fontSize: '10px', lineHeight: '1.3' }}>
+                  Hovered: {hovered ? 'YES' : 'NO'}<br/>
+                  Sparkles: {hovered ? 10 : 6}<br/>
+                  Material: {hovered ? 'Enhanced' : 'Standard'}<br/>
+                  Texture: {textureData ? 'Loaded' : 'None'}
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ 
+              marginTop: '8px', 
+              paddingTop: '8px', 
+              borderTop: `1px solid ${color}40`,
+              fontSize: '10px',
+              color: '#cccccc',
+              textAlign: 'center'
+            }}>
+              Real-time Letter Analysis • Hover for Live Data
+            </div>
           </Html>
         )}
       </group>
@@ -697,6 +826,7 @@ const AnimatedText: React.FC<AnimatedTextProps> = React.memo(({
               fontSize={selectedLetter === data.index ? fontSize * 1.1 : fontSize}
               initialOffset={data.offset}
               billboardMode={billboardMode}
+              letterIndex={index}
             />
           </group>
         );
@@ -830,7 +960,7 @@ const TextAnimation: React.FC<SceneProps> = ({
   return (
     <div style={{ 
       width: '100%', 
-      height: '100vh', 
+      height: '75vh', 
       background: 'linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e)',
       touchAction: 'manipulation',
       cursor: interactiveMode ? 'pointer' : 'default'
@@ -858,28 +988,6 @@ const TextAnimation: React.FC<SceneProps> = ({
         {renderBackgroundEffect()}
         
       </Canvas>
-      
-      {/* UI Controls */}
-      {interactiveMode && (
-        <div style={{
-          position: 'absolute',
-          top: '50px',
-          left: '20px',
-          color: '#ffffff',
-          fontFamily: 'monospace',
-          fontSize: '12px',
-          background: 'rgba(0,0,0,0.5)',
-          padding: '10px',
-          borderRadius: '8px',
-          pointerEvents: 'none'
-        }}>
-          Billboard Mode: {billboardMode}<br/>
-          Background: {backgroundEffect}<br/>
-          Intensity: {backgroundIntensity}<br/>
-          Interactive: {interactiveMode ? 'ON' : 'OFF'}<br/>
-          Hover letters for effects
-        </div>
-      )}
     </div>
   );
 };

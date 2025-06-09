@@ -17,7 +17,7 @@ export default function AIProjects() {
     { href: "/contact", text: "Contact" },
   ];
 
-  const logo = <div>My Logo</div>;
+  const logo = <div>Adam Timur Aslan</div>;
 
   return (
     <div className="threejs-container">

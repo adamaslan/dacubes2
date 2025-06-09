@@ -5,7 +5,7 @@ import "../styles/frontend.css";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "GitHub Projects" },
+    { title: "Frontend Projects" },
     { name: "description", content: "Explore our GitHub projects" },
   ];
 };
@@ -17,49 +17,116 @@ export default function AIProjects() {
     { href: "/contact", text: "Contact" },
   ];
 
-  const logo = <div>My Logo</div>;
+  const logo = <div>Adam Timur Aslan</div>;
 
   return (
-    <div className="projects-container">
+    <div className="threejs-container">
       <Navbar links={navLinks} logo={logo} />
       
-      <main className="projects-main">
-        <h1 className="projects-heading">GitHub Projects</h1>
+      <main className="threejs-main">
+        <h1 className="threejs-title">Frontend Projects</h1>
         
-        <div className="projects-grid" id="parent">
-          <a href="https://github.com/yourusername/project1" className="project-card blue">
-            <div className="project-content">
-              <h2 className="project-title">GitHub 1</h2>
-              <p className="project-description">React Project Repository</p>
-              <p className="project-cta">Click to view source code</p>
-            </div>
-          </a>
+        <div className="threejs-grid" id="parent">
+        
+          <div className="threejs-card threejs-card-purp">
+            <a href="https://github.com/adamaslan/dfl" className="project-content-link">
+              <div className="threejs-card-content">
+                <h2 className="threejs-card-title">Drinks Food Life</h2>
+                <p className="threejs-card-text">Fullstack NextJS React App running on Vercel featuring a complex grid using Tailwind</p>
+                <p className="threejs-card-subtext">Click to explore the code</p>
+              </div>
+            </a>
+            <video 
+              autoPlay 
+              loop 
+              muted
+              controls
+              onClick={(e) => {
+                if (e.currentTarget.requestFullscreen) {
+                  e.currentTarget.requestFullscreen();
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              <source src="/dfl1b.mov" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
 
-          <a href="https://github.com/yourusername/project2" className="project-card green">
-            <div className="project-content">
-              <h2 className="project-title">GitHub 2</h2>
-              <p className="project-description">Node.js Backend API</p>
-              <p className="project-cta">Click to explore the code</p>
-            </div>
-          </a>
+          <div className="threejs-card threejs-card-purp">
+            <a href="https://github.com/adamaslan/intartmag" className="project-content-link">
+              <div className="threejs-card-content">
+                <h2 className="threejs-card-title">International Art Magazine</h2>
+                <p className="threejs-card-text">This website features a responsive Navbar that turns transparent and begins pink for mobile.</p>
+                <p className="threejs-card-subtext">Click to explore the code</p>
+              </div>
+            </a>
+            <video 
+              autoPlay 
+              loop 
+              muted
+              controls
+              onClick={(e) => {
+                if (e.currentTarget.requestFullscreen) {
+                  e.currentTarget.requestFullscreen();
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              <source src="/iam1b.mov" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
 
-          <a href="https://github.com/yourusername/project3" target="_blank" rel="noopener noreferrer" 
-             className="block w-[280px] sm:w-[320px] md:w-[360px] aspect-square mx-auto bg-purple-500 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 group">
-            <div className="flex flex-col items-center justify-center h-full w-full p-6 text-center">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">GitHub 3</h2>
-              <p className="text-white text-sm sm:text-base">Three.js 3D Models</p>
-              <p className="text-purple-100 text-xs sm:text-sm mt-2">View 3D project code</p>
-            </div>
-          </a>
+          <div className="threejs-card threejs-card-purp">
+            <a href="https://github.com/yourusername/project2" className="project-content-link">
+              <div className="threejs-card-content">
+                <h2 className="threejs-card-title">Tasty Tech Bytes</h2>
+                <p className="threejs-card-text">Fullstack React Remix App running on Netlify featuring a complex grid using Tailwind</p>
+                <p className="threejs-card-subtext">Click to explore the code</p>
+              </div>
+            </a>
+            <video 
+              autoPlay 
+              loop 
+              muted
+              controls
+              onClick={(e) => {
+                if (e.currentTarget.requestFullscreen) {
+                  e.currentTarget.requestFullscreen();
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              <source src="/ttb2.mov" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
 
-          <a href="https://github.com/yourusername/project4" target="_blank" rel="noopener noreferrer" 
-             className="block w-[280px] sm:w-[320px] md:w-[360px] aspect-square mx-auto bg-red-500 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 group">
-            <div className="flex flex-col items-center justify-center h-full w-full p-6 text-center">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">GitHub 4</h2>
-              <p className="text-white text-sm sm:text-base">Full Stack Application</p>
-              <p className="text-red-100 text-xs sm:text-sm mt-2">Explore the repository</p>
-            </div>
-          </a>
+          <div className="threejs-card threejs-card-purp">
+            <a href="https://github.com/adamaslan/dfl/blob/main/src/app/besttacosinbk/page.js" className="project-content-link">
+              <div className="threejs-card-content">
+                <h2 className="threejs-card-title">Taco Poll Results Chart</h2>
+                <p className="threejs-card-text">A Vibrant Recharts Graph that utilizes the D3 library to create a responsive graph with hover effects for superior User Experience and Interaction</p>
+                <p className="threejs-card-subtext">Click to explore the code</p>
+              </div>
+            </a>
+            <video 
+              autoPlay 
+              loop 
+              muted
+              controls
+              onClick={(e) => {
+                if (e.currentTarget.requestFullscreen) {
+                  e.currentTarget.requestFullscreen();
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              <source src="/taco-graph.mov" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
         </div>
       </main>
     </div>
