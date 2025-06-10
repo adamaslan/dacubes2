@@ -93,10 +93,10 @@ export default function Index() {
           }}>
            <TextAnimation 
   text="Frontend" 
-  backgroundEffect="waves"
+  backgroundEffect="particles"
   backgroundIntensity={1.2}
-  primaryColor="#800080"
-  secondaryColor="#4ecdc4"
+  primaryColor="#FF69B4"
+  secondaryColor="#FF69B4"
 />
           </a>
           <a href="/threejs" style={{
