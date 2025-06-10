@@ -520,10 +520,10 @@ const NeuralNetwork: React.FC<BackgroundEffectProps> = ({
 // Geometric Waves Effect
 const GeometricWaves: React.FC<BackgroundEffectProps> = ({ 
   intensity = 1, 
-  color = '#ffffff',
+  color = "#00FF00",
   // This secondary color can be customized when using the GeometricWaves component:
   // Example: <GeometricWaves secondaryColor="#ff0000" />
-  secondaryColor = '#4ecdc4'
+  secondaryColor = "#FF69B4"
 }) => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const { viewport } = useThree();
