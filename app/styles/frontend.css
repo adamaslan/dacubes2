@@ -78,16 +78,17 @@
 .threejs-card-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: black;
+  color: whitesmoke;
   margin-bottom: 0.75rem;
 }
 
 .threejs-card-text {
-  color: black;
+  color: white;
   font-size: 0.875rem;
 }
 
 .threejs-card-subtext {
   font-size: 0.75rem;
   margin-top: 0.5rem;
+  color: white;
 }

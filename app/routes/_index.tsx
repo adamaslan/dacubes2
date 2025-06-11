@@ -95,7 +95,7 @@ export default function Index() {
   text="Frontend" 
   backgroundEffect="particles"
   backgroundIntensity={1.2}
-  primaryColor="#FF69B4"
+  primaryColor="f824ff"
   secondaryColor="#FF69B4"
 />
           </a>
