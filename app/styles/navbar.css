@@ -1,6 +1,7 @@
 /* /Users/adamaslan/code/dacubes2/app/styles/navbar.css */
 /* Import Google Fonts if not already imported elsewhere */
 @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bungee+Shade&family=Faster+One&family=Rubik+Glitch&family=Rubik+Iso&family=Rubik+Puddles&family=Nabla&family=Monoton&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
 
 .navbar {
   position: fixed;
@@ -43,7 +44,7 @@
   transition-duration: 150ms; /* Tailwind default transition */
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 700; /* font-bold (applied to passed logo text) */
-  font-family: 'Permanent Marker', cursive; /* Added Permanent Marker font */
+  font-family: 'Chewy', cursive; /* Added Permanent Marker font */
   /* Color will be set based on parent .navbar-transparent or .navbar-scrolled */
 }
 
@@ -75,7 +76,7 @@
   padding: 0.25rem 0.5rem; /* px-2 py-1 (4px 8px) */
   border-radius: 0.5rem; /* rounded-lg (8px) */
   text-decoration: none;
-  font-family: 'Permanent Marker', cursive; /* Added Permanent Marker font */
+  font-family: 'Chewy', cursive; /* Added Permanent Marker font */
 }
 
 .navbar-link-item a:hover {

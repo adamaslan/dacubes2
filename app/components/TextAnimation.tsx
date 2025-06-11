@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useCallback, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, Props as CanvasProps } from '@react-three/fiber'; // Import CanvasProps
 import { Text, Float, Sparkles, useScroll, Billboard, Html, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -12,6 +12,7 @@ interface CurveTextProps {
   initialOffset?: number;
   billboardMode?: 'full' | 'horizontal' | 'vertical' | 'none';
   letterIndex?: number;
+  fontFamily?: string; // Custom prop for font
 }
 
 const CurveText: React.FC<CurveTextProps> = React.memo(({
@@ -21,7 +22,8 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
   fontSize = 1,
   initialOffset = 0,
   billboardMode = 'horizontal',
-  letterIndex = 0
+  letterIndex = 0,
+  fontFamily, // Use this for the Text component's font prop
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const billboardRef = useRef<THREE.Group>(null);
