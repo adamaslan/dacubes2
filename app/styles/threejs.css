@@ -91,3 +91,7 @@
   font-size: 0.75rem;
   margin-top: 0.5rem;
 }
+body {
+  font-family: 'Chewy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+  text-align: center;
+}

@@ -51,14 +51,14 @@ export default function Index() {
           { href: "/about", text: "About" },
           { href: "/contact", text: "Contact" }
         ]} 
-        logo={<div className="navbar-logo-tetxt" style={{fontFamily: "'Permanent Marker', cursive"}}>Adam Aslan's Portfolio</div>} 
+        logo={<div className="navbar-logo-text" style={{fontFamily: "'Chewy', cursive"}}>Adam Aslan's Portfolio</div>} 
       />
       
       <div className="header-content"> {/* Changed from Tailwind classes */}
-        <h1 className="main-title" style={{fontFamily: "'Permanent Marker', cursive"}}> 
+        <h1 className="main-title" style={{fontFamily: "'Chewy', cursive"}}> 
         3D AI Fullstack Developer
         </h1>
-        <h2 className="subtitle" style={{fontFamily: "'Permanent Marker', cursive"}}>Welcome to My Portfolio</h2>
+        <h2 className="subtitle" style={{fontFamily: "'Chewy', cursive"}}>Welcome to My Portfolio</h2>
       </div>
 
       {/* Add TextAnimation component */}
