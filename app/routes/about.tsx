@@ -37,7 +37,7 @@ export default function About() {
           { href: "/about", text: "About" },
           { href: "/contact", text: "Contact" },
         ]}
-        logo={<div className="">LOGO</div>} // Removed Tailwind from logo prop; Navbar CSS will style it
+        logo={<div className="">Adam Timur Aslan</div>} // Removed Tailwind from logo prop; Navbar CSS will style it
       />
       <div className="about-grid-container">
         <div

@@ -3,14 +3,13 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Text, Float, Sparkles, Billboard, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Enhanced Billboard component with 15% more 3D depth
 interface Enhanced3DBillboardProps {
   text: string;
   position?: [number, number, number];
   color?: string;
   fontSize?: number;
   billboardMode?: 'full' | 'horizontal' | 'vertical' | 'none';
-  enhance3D?: number; // Enhancement factor (1.15 = 15% more 3D)
+  enhance3D?: number;
   depthLayers?: number;
   shadowIntensity?: number;
   volumetricEffect?: boolean;
@@ -30,7 +29,7 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
   color = '#00ffff',
   fontSize = 1,
   billboardMode = 'horizontal',
-  enhance3D = 1.15, // 15% enhancement by default
+  enhance3D = 1.15,
   depthLayers = 8,
   shadowIntensity = 0.6,
   volumetricEffect = true,
@@ -44,44 +43,38 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
   roughness = 0.2
 }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const billboardRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
-  const { viewport, camera } = useThree();
+  const { viewport } = useThree();
 
-  // Enhanced responsive sizing with 3D factor
   const enhanced3DSize = useMemo(() => {
-    const baseSize = fontSize;
     const responsiveScale = Math.min(viewport.width / 10, viewport.height / 10, 1.5);
     const hoverScale = hovered ? 1.1 : 1.0;
-    const depthScale = enhance3D;
-    return baseSize * responsiveScale * hoverScale * depthScale;
+    return fontSize * responsiveScale * hoverScale * enhance3D;
   }, [fontSize, viewport.width, viewport.height, hovered, enhance3D]);
 
-  // Enhanced 3D texture with depth mapping
-  const enhanced3DTexture = useMemo(() => {
-    const size = 64; // Higher resolution for better 3D effect
+  // Combined texture generation for both diffuse and normal
+  const enhanced3DTextures = useMemo(() => {
+    const size = 64;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
     const context = canvas.getContext('2d');
     
-    if (!context) return null;
+    if (!context) return { diffuse: null, normal: null };
     
+    // Diffuse texture
     const imageData = context.createImageData(size, size);
     const data = imageData.data;
     
-    // Create depth-based texture pattern
     for (let i = 0; i < data.length; i += 4) {
       const x = (i / 4) % size;
       const y = Math.floor((i / 4) / size);
       
-      // Multiple noise layers for enhanced depth
       const centerX = size / 2;
       const centerY = size / 2;
       const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
       const normalizedDistance = distance / (size / 2);
       
-      // Create depth gradient
       const depthNoise = Math.sin(x * 0.1) * Math.cos(y * 0.1) * 0.3 + 0.7;
       const radialDepth = (1 - normalizedDistance) * 0.5 + 0.5;
       const combined = (depthNoise + radialDepth) / 2;
@@ -94,62 +87,45 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
     }
     
     context.putImageData(imageData, 0, 0);
+    const diffuseTexture = new THREE.CanvasTexture(canvas);
     
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(1, 1);
-    texture.needsUpdate = true;
-    return texture;
-  }, [enhance3D]);
-
-  // Enhanced normal map for 3D depth
-  const depthNormalMap = useMemo(() => {
-    const size = 32;
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const context = canvas.getContext('2d');
+    // Normal map (simplified)
+    const normalCanvas = document.createElement('canvas');
+    normalCanvas.width = 32;
+    normalCanvas.height = 32;
+    const normalContext = normalCanvas.getContext('2d');
     
-    if (!context) return null;
-    
-    const imageData = context.createImageData(size, size);
-    const data = imageData.data;
-    
-    for (let i = 0; i < data.length; i += 4) {
-      const x = (i / 4) % size;
-      const y = Math.floor((i / 4) / size);
+    if (normalContext) {
+      const normalData = normalContext.createImageData(32, 32);
+      const nData = normalData.data;
       
-      // Generate normal map for enhanced 3D effect
-      const normalX = (Math.sin(x * 0.2) * 0.5 + 0.5) * 255;
-      const normalY = (Math.cos(y * 0.2) * 0.5 + 0.5) * 255;
-      const normalZ = 255 * enhance3D; // Enhanced Z component
+      for (let i = 0; i < nData.length; i += 4) {
+        const x = (i / 4) % 32;
+        const y = Math.floor((i / 4) / 32);
+        
+        nData[i] = (Math.sin(x * 0.2) * 0.5 + 0.5) * 255;
+        nData[i + 1] = (Math.cos(y * 0.2) * 0.5 + 0.5) * 255;
+        nData[i + 2] = 255 * enhance3D;
+        nData[i + 3] = 255;
+      }
       
-      data[i] = normalX;
-      data[i + 1] = normalY;
-      data[i + 2] = normalZ;
-      data[i + 3] = 255;
+      normalContext.putImageData(normalData, 0, 0);
     }
     
-    context.putImageData(imageData, 0, 0);
+    const normalTexture = new THREE.CanvasTexture(normalCanvas);
     
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.needsUpdate = true;
-    return texture;
+    return { diffuse: diffuseTexture, normal: normalTexture };
   }, [enhance3D]);
 
-  // Animation with enhanced 3D movement
   useFrame((state, delta) => {
     if (!groupRef.current) return;
 
     const time = state.clock.elapsedTime * animationSpeed;
     
-    // Enhanced 3D floating motion
     const floatY = Math.sin(time * 1.2) * 0.08 * enhance3D;
     const floatX = Math.cos(time * 0.8) * 0.04 * enhance3D;
     const floatZ = Math.sin(time * 0.6) * 0.03 * enhance3D;
     
-    // Apply enhanced position with perspective shift
     const basePosition = new THREE.Vector3(...position);
     basePosition.x += floatX + (hovered ? perspectiveShift : 0);
     basePosition.y += floatY;
@@ -157,107 +133,63 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
     
     groupRef.current.position.copy(basePosition);
     
-    // Enhanced rotation for 3D effect
     if (billboardMode === 'none') {
       groupRef.current.rotation.z = Math.sin(time * 0.5) * 0.05 * enhance3D;
     }
   });
 
-  // Billboard configuration
   const getBillboardProps = () => {
     switch (billboardMode) {
-      case 'full':
-        return { follow: true, lockX: false, lockY: false, lockZ: false };
-      case 'horizontal':
-        return { follow: true, lockX: true, lockY: false, lockZ: true };
-      case 'vertical':
-        return { follow: true, lockX: false, lockY: true, lockZ: false };
-      default:
-        return null;
+      case 'full': return { follow: true, lockX: false, lockY: false, lockZ: false };
+      case 'horizontal': return { follow: true, lockX: true, lockY: false, lockZ: true };
+      case 'vertical': return { follow: true, lockX: false, lockY: true, lockZ: false };
+      default: return null;
     }
   };
 
-  // Enhanced 3D materials with depth
-  const enhanced3DMaterials = useMemo(() => {
-    const baseEmissiveIntensity = glowIntensity * (hovered ? 1.5 : 1.0);
-    
-    return {
-      // Deep shadow layers for enhanced depth
-      deepShadow: {
-        color: "#000000",
-        metalness: 0.1,
-        roughness: 0.9,
-        opacity: shadowIntensity * 0.8,
-        transparent: true,
-      },
-      mediumShadow: {
-        color: "#111111",
-        metalness: 0.2,
-        roughness: 0.8,
-        opacity: shadowIntensity * 0.6,
-        transparent: true,
-      },
-      lightShadow: {
-        color: "#222222",
-        metalness: 0.3,
-        roughness: 0.7,
-        opacity: shadowIntensity * 0.4,
-        transparent: true,
-      },
-      // Main text with enhanced 3D properties
-      main: {
-        color: color,
-        metalness: metalness * enhance3D,
-        roughness: roughness / enhance3D,
-        emissive: color,
-        emissiveIntensity: baseEmissiveIntensity,
-        map: enhanced3DTexture,
-        normalMap: depthNormalMap,
-        normalScale: new THREE.Vector2(enhance3D, enhance3D),
-      },
-      // Enhanced rim lighting
-      rim: {
-        color: color,
-        metalness: 1.0,
-        roughness: 0.0,
-        emissive: color,
-        emissiveIntensity: baseEmissiveIntensity * 1.5,
-        opacity: hovered ? 0.9 : 0.7,
-        transparent: true,
-      },
-      // Volumetric glow effect
-      volumetric: {
-        color: color,
-        metalness: 0.0,
-        roughness: 1.0,
-        emissive: color,
-        emissiveIntensity: baseEmissiveIntensity * 2,
-        opacity: 0.15,
-        transparent: true,
-        side: THREE.BackSide,
-      }
-    };
-  }, [color, enhanced3DTexture, depthNormalMap, enhance3D, hovered, glowIntensity, shadowIntensity, metalness, roughness]);
+  const baseEmissiveIntensity = glowIntensity * (hovered ? 1.5 : 1.0);
+  
+  const materials = {
+    main: {
+      color: color,
+      metalness: metalness * enhance3D,
+      roughness: roughness / enhance3D,
+      emissive: color,
+      emissiveIntensity: baseEmissiveIntensity,
+      map: enhanced3DTextures.diffuse,
+      normalMap: enhanced3DTextures.normal,
+      normalScale: new THREE.Vector2(enhance3D, enhance3D),
+    },
+    volumetric: {
+      color: color,
+      emissive: color,
+      emissiveIntensity: baseEmissiveIntensity * 2,
+      opacity: 0.15,
+      transparent: true,
+      side: THREE.BackSide,
+    }
+  };
 
-  // Handle hover interactions
   const handleHover = (isHovered: boolean) => {
     setHovered(isHovered);
     onHover?.(isHovered);
   };
 
-  // Generate depth layers for enhanced 3D effect
+  // Simplified depth layers
   const renderDepthLayers = () => {
     const layers = [];
+    const shadowLayers = Math.floor(depthLayers * 0.6);
     
-    // Deep shadow layers
-    for (let i = 0; i < Math.floor(depthLayers * 0.4); i++) {
-      const depth = (i + 1) * 0.08 * enhance3D;
-      const opacity = shadowIntensity * (1 - i / depthLayers);
+    for (let i = 0; i < shadowLayers; i++) {
+      const depth = (i + 1) * 0.06 * enhance3D;
+      const opacity = shadowIntensity * (1 - i / shadowLayers);
+      const shadowColor = i < shadowLayers / 2 ? "#000000" : "#333333";
+      
       layers.push(
         <Text
           key={`shadow-${i}`}
           position={[depth, -depth, -depth]}
-          fontSize={enhanced3DSize * (1 + i * 0.02)}
+          fontSize={enhanced3DSize * (1 + i * 0.015)}
           anchorX="center"
           anchorY="middle"
           font={fontFamily}
@@ -265,35 +197,9 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
         >
           {text}
           <meshStandardMaterial
-            color="#000000"
-            metalness={0.1}
-            roughness={0.9}
-            opacity={opacity}
-            transparent
-          />
-        </Text>
-      );
-    }
-    
-    // Mid-tone layers
-    for (let i = 0; i < Math.floor(depthLayers * 0.3); i++) {
-      const depth = i * 0.04 * enhance3D;
-      const opacity = 0.6 * (1 - i / depthLayers);
-      layers.push(
-        <Text
-          key={`mid-${i}`}
-          position={[depth * 0.7, -depth * 0.7, -depth]}
-          fontSize={enhanced3DSize * (1 + i * 0.01)}
-          anchorX="center"
-          anchorY="middle"
-          font={fontFamily}
-          letterSpacing={letterSpacing}
-        >
-          {text}
-          <meshStandardMaterial
-            color="#333333"
-            metalness={0.3}
-            roughness={0.7}
+            color={shadowColor}
+            metalness={0.2}
+            roughness={0.8}
             opacity={opacity}
             transparent
           />
@@ -314,10 +220,8 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
         onPointerOver={() => handleHover(true)}
         onPointerOut={() => handleHover(false)}
       >
-        {/* Depth layers for enhanced 3D effect */}
         {renderDepthLayers()}
 
-        {/* Volumetric background layer */}
         {volumetricEffect && (
           <Text
             position={[0, 0, -0.1]}
@@ -328,11 +232,10 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
             letterSpacing={letterSpacing}
           >
             {text}
-            <meshStandardMaterial {...enhanced3DMaterials.volumetric} />
+            <meshStandardMaterial {...materials.volumetric} />
           </Text>
         )}
 
-        {/* Main text with enhanced 3D properties */}
         <Text
           fontSize={enhanced3DSize}
           anchorX="center"
@@ -341,23 +244,9 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
           letterSpacing={letterSpacing}
         >
           {text}
-          <meshStandardMaterial {...enhanced3DMaterials.main} />
+          <meshStandardMaterial {...materials.main} />
         </Text>
 
-        {/* Enhanced rim lighting */}
-        <Text
-          position={[0, 0, 0.05 * enhance3D]}
-          fontSize={enhanced3DSize * 0.98}
-          anchorX="center"
-          anchorY="middle"
-          font={fontFamily}
-          letterSpacing={letterSpacing}
-        >
-          {text}
-          <meshStandardMaterial {...enhanced3DMaterials.rim} />
-        </Text>
-
-        {/* Enhanced sparkles with 3D positioning */}
         <Sparkles
           count={hovered ? 15 : 10}
           scale={[enhanced3DSize * 4, enhanced3DSize * 4, enhanced3DSize * 2 * enhance3D]}
@@ -367,7 +256,6 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
           opacity={hovered ? 0.9 : 0.7}
         />
 
-        {/* Enhanced debug info */}
         {hovered && (
           <Html
             position={[0, enhanced3DSize + 1, 0]}
@@ -408,7 +296,7 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
   return (
     <group ref={groupRef}>
       {billboardProps ? (
-        <Billboard ref={billboardRef} {...billboardProps}>
+        <Billboard {...billboardProps}>
           {textContent}
         </Billboard>
       ) : (
