@@ -20,7 +20,7 @@ export default function Contact() {
           { href: "/about", text: "About" },
           { href: "/contact", text: "Contact" }
         ]}
-        logo={<div className="animate-pulse">ATA</div>}
+        logo={<div className="animate-pulse">Adam Timur Aslan</div>}
       />
 
       <main className="animate-gradient">
@@ -28,8 +28,8 @@ export default function Contact() {
           {/* Bio Section with floating animation */}
           <div className="bio-card">
             <p className="bio-text">
-              Based in Brooklyn, passionate about 3D art, electronic music, and full-stack development 
-              with over 8 years of experience creating digital experiences.
+              Adam Timur Aslan is based in Brooklyn, passionate about 3D art, AI, a wide swath of musical genres, and full-stack development. 
+              Adam has over 10 years of experience in creating captivating digital experiences.
             </p>
           </div>
 
