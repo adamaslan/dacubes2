@@ -13,14 +13,14 @@
 }
 
 .about-grid-item {
-  padding: 2rem; /* p-8 (32px) */
+  padding: 1rem; /* p-8 (32px) */
   text-align: center;
   min-height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white; /* text-white */
-  font-weight: 700; /* font-bold */
+  font-weight:900; /* font-bold */
   /* background-color will be applied via inline styles as before */
 }
 
