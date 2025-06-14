@@ -20,7 +20,8 @@
   align-items: center;
   justify-content: center;
   color: white; /* text-white */
-  font-weight:900; /* font-bold */
+  font-weight: 900; /* font-bold */
+  font-family: 'Comic Sans MS', cursive; /* Adding a fun font */
   /* background-color will be applied via inline styles as before */
 }
 
