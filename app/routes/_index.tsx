@@ -78,7 +78,7 @@ export default function Index() {
           height: '100vh', 
           background: '#ff69b4',
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 45vw)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 45vw))',
           gap: '2vw',
           justifyContent: 'center',
           alignItems: 'center',
