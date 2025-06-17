@@ -38,7 +38,7 @@ export default function Index() {
 
       <Suspense fallback={<div className="loading-message">Loading 3D navigation...</div>}> 
         <div className="portfolio-grid">
-          <div className="portfolio-item">  <a href="/frontend">    <span className="portfolio-label">Click here to explore my frontend portfolio</span> </a></div>
+        <a href="/frontend">     <div className="portfolio-item">    <span className="portfolio-label">Click here to explore my frontend portfolio</span> </div></a>
         
        
          
@@ -50,7 +50,7 @@ export default function Index() {
               secondaryColor="#FF69B4"
             />
       
-      <div className="portfolio-item">  <a href="/threejs">    <span className="portfolio-label">Click here to explore my ThreeJS and React Three Fiber Portfolio</span> </a></div>
+      <a href="/threejs">  <div className="portfolio-item">     <span className="portfolio-label">Click here to explore my ThreeJS and React Three Fiber Portfolio</span> </div></a>
         
        
           <div className="portfolio-item">

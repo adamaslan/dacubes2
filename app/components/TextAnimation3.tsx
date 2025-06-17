@@ -175,7 +175,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
           fontSize={responsiveFontSize * 1.02}
           anchorX="center"
           anchorY="middle"
-          font="/fonts/helvetiker_bold.typeface.json"
+          // font="/fonts/helvetiker_bold.typeface.json"
         >
           {text}
           <meshStandardMaterial {...materials.shadow} />
@@ -186,7 +186,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
           fontSize={responsiveFontSize * 1.01}
           anchorX="center"
           anchorY="middle"
-          font="/fonts/helvetiker_bold.typeface.json"
+          // font="/fonts/helvetiker_bold.typeface.json"
         >
           {text}
           <meshStandardMaterial {...materials.mid} />
@@ -197,7 +197,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
           fontSize={responsiveFontSize}
           anchorX="center"
           anchorY="middle"
-          font="/fonts/helvetiker_bold.typeface.json"
+          // font="/fonts/helvetiker_bold.typeface.json"
         >
           {text}
           <meshStandardMaterial {...materials.main} />
@@ -209,7 +209,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
           fontSize={responsiveFontSize * 0.99}
           anchorX="center"
           anchorY="middle"
-          font="/fonts/helvetiker_bold.typeface.json"
+          // font="/fonts/helvetiker_bold.typeface.json"
         >
           {text}
           <meshStandardMaterial {...materials.rim} />
