@@ -291,7 +291,7 @@ const CurveText: React.FC<CurveTextProps> = React.memo(({
 
         {/* Rim light */}
         <Text
-          position={[0, 0, 0.02]}
+          position={[0, 0, 0.03]}
           fontSize={responsiveFontSize * 0.99}
           anchorX="center"
           anchorY="middle"
