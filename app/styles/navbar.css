@@ -54,7 +54,7 @@
 
 /* Logo color based on navbar state */
 .navbar-transparent .navbar-container .navbar-logo {
-  color: rgb(0, 0, 0);
+  color: rgb(152, 152, 152);
 }
 
 .navbar-scrolled .navbar-container .navbar-logo {
@@ -68,7 +68,7 @@
 }
 
 .navbar-link-item a {
-  color: #374151; /* text-gray-700 */
+  color: #989898; /* text-gray-700 */
   font-weight: 500; /* font-medium */
   transition-property: all; /* transition-all */
   transition-duration: 300ms; /* duration-300 */
