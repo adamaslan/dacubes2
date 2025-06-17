@@ -78,7 +78,7 @@ export default function Index() {
           height: '100vh', 
           background: '#ff69b4',
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 45vw)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 45vw))',
           gap: '2vw',
           justifyContent: 'center',
           alignItems: 'center',
@@ -90,8 +90,18 @@ export default function Index() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center'
-          }}>
-           <TextAnimation 
+          }}><span style={{
+            fontFamily: "'Chewy', cursive", 
+            fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', 
+            position: 'absolute',
+            width: '100%',
+            textAlign: 'center',
+            top: '15%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1
+          }}>Frontend</span>
+           <TextAnimation
   text="Frontend" 
   backgroundEffect="particles"
   backgroundIntensity={1.2}
@@ -105,7 +115,7 @@ export default function Index() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center'
-          }}>
+          }}></a>
     <TextAnimation 
   text="ThreeJS" 
   backgroundEffect="grid"
@@ -113,7 +123,7 @@ export default function Index() {
   primaryColor="#00f2f2"
   secondaryColor="#ffffff"
 />
-          </a>
+          
         </div>
         {/* <TextAnimation2 text="ThreeJS" /> */}
       </Suspense>
