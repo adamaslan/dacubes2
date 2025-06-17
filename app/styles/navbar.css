@@ -54,14 +54,14 @@
 
 /* Logo color based on navbar state */
 .navbar-transparent .navbar-container .navbar-logo {
-  color: rgb(152, 152, 152);
+  color: rgb(0, 0, 0);
 }
 
 .navbar-scrolled .navbar-container .navbar-logo {
-  color: #1f2937; /* Example: text-gray-800, good for light backgrounds */
+  color: #1911ff;/* Example: text-gray-800, good for light backgrounds */
 }
 .navbar-scrolled .navbar-link-item a {
-  color: #374151; /* Example: slightly lighter gray */
+  color: #1911ff;/* Example: slightly lighter gray */
 }
 
 /* Or if you want a smooth transition */
@@ -70,7 +70,7 @@
 }
 
 .navbar-scrolled .navbar-link-item a {
-  color: #1f2937;
+  color: #1911ff;
 }
 
 
@@ -80,7 +80,7 @@
 }
 
 .navbar-link-item a {
-  color: #989898; /* text-gray-700 */
+  color: #000000; /* text-gray-700 */
   font-weight: 500; /* font-medium */
   transition-property: all; /* transition-all */
   transition-duration: 300ms; /* duration-300 */

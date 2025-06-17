@@ -30,9 +30,8 @@ export default function AIProjects() {
         <div
              className="threejs-card threejs-card-blue">
             <div className="threejs-card-content">
-              <h2 className="threejs-card-title">Rotating Sphere with Orbiting Text: A 3D Splash Screen in Motion🌍🔴Homepage</h2>
-              <p className="threejs-card-text">This React component creates a visually dynamic splash screen using **@react-three/fiber** and **@react-three/drei** to render a rotating, orbiting 3D sphere with embedded text. The `RotatingSphere` component uses a `ref` to directly manipulate the sphere's position and rotation in each frame, via the `useFrame` hook. The sphere continuously rotates on its X and Y axes while simultaneously orbiting around the center using trigonometric functions (`Math.sin` and `Math.cos`) based on the elapsed time, creating a smooth circular motion. A `Text` element reading **"ZXY"** is attached to the sphere, positioned offset on its surface, and rendered in red with beveling for emphasis. The `SplashScreen` component places the animation within a canvas that’s styled to sit near the vertical center of the viewport, using ambient and point lighting to illuminate the metallic sphere. This working code offers a clean, elegant 3D animation suitable for introductory branding or visual loading screens.
-              </p>
+              <h2 className="threejs-card-title">Rotating Sphere with Orbiting Text on Homepage 🌍🔴</h2>
+              <p className="threejs-card-text">This React component creates an animated 3D splash screen using the **@react-three/fiber** and **@react-three/drei** libraries. It features a metallic sphere that continuously rotates on its own axes while simultaneously orbiting a central point. The sphere has the text **"ZXY"** rendered in red and beveled, appearing to be embedded on its surface. The animation is displayed within a styled canvas, illuminated by ambient and point lighting, making it suitable for a dynamic loading or branding screen.</p>
               {/* <p className="threejs-card-subtext">Click to view source code</p> */}
               </div> <video 
               autoPlay 
@@ -102,9 +101,8 @@ export default function AIProjects() {
           <div 
              className="threejs-card threejs-card-blue">
             <div className="threejs-card-content">
-              <h2 className="threejs-card-title">Interactive Stars, Space, and Donut Banner</h2>
-              <p className="threejs-card-text">This React code creates a visually engaging 3D scene using `@react-three/fiber` and `@react-three/drei`, centered around two main animated components: a metallic sphere and a rotating torus. The `Sphere1` component animates a reflective sphere in a circular orbit, using trigonometric functions to update its position with each frame via the `useFrame` hook. It also displays the text “TTB” floating just in front of the sphere, enhancing its visual identity. The `Torus1` component adds a rotating orange torus at the center of the scene. The `MovingObject` component brings the scene together inside a canvas element styled with Tailwind CSS for responsive layout and a dark background. It includes lighting (a pink-tinted hemisphere light and a point light) and a dynamic starfield using the `Stars` component, adding depth and ambiance. The `OrbitControls` allows interactive camera movement, making the scene immersive and explorable. Overall, the code exemplifies a clean, modular approach to building animated 3D web visuals in React.
-              </p>
+              <h2 className="threejs-card-title">Interactive Stars, Sphere, Text Space, and Donut Banner</h2>
+              <p className="threejs-card-text">This React component creates an interactive 3D scene using **@react-three/fiber** and **@react-three/drei**. It features a **metallic sphere** that orbits in a circular path with the text "TTB" floating in front of it, and a **rotating orange torus** at the center. The scene is set within a responsive canvas with a dark background, enhanced by pink-tinted hemispheric and point lighting, and a dynamic **starfield** for added depth. Users can interactively explore the scene thanks to **OrbitControls** for camera movement. The code demonstrates a clean, modular way to build animated 3D web visuals in React. </p>
               {/* <p className="threejs-card-subtext">Click to view source code</p> */}
              
             </div>

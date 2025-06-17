@@ -36,7 +36,7 @@ const Enhanced3DBillboard: React.FC<Enhanced3DBillboardProps> = ({
   glowIntensity = 0.8,
   perspectiveShift = 0.12,
   letterSpacing = 0.05,
-  fontFamily = "/fonts/helvetiker_bold.typeface.json",
+  fontFamily = "/fonts/utopia_serif-webfont.ttf",
   onHover,
   animationSpeed = 1.0,
   metalness = 0.8,

@@ -8,28 +8,31 @@
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  color: deepskyblue;
 }
 
 /* Header content responsive styling */
 .header-content {
   text-align: center;
-  padding: 2rem 1rem;
+  padding-top: 3rem;
   max-width: 1200px;
   margin: 0 auto;
+  background-color: rgb(241, 139, 255);
 }
 
 .main-title {
   font-family: 'Chewy', cursive;
   font-size: clamp(2rem, 5vw, 4rem);
+  padding-top: 2rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: #000000;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 }
 
 .subtitle {
   font-family: 'Chewy', cursive;
   font-size: clamp(1.2rem, 3vw, 2rem);
-  color: #666;
+  color: #000000;
   margin-bottom: 2rem;
 }
 
