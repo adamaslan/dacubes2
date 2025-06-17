@@ -10,7 +10,7 @@
   right: 0; /* Added for completeness, effectively width: 100% */
   z-index: 50;
   transition-property: background-color, backdrop-filter, box-shadow; /* Removed opacity as it's not in original TW */
-  transition-duration: 300ms;
+  transition-duration: 700ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   padding-top: 0.75rem;    /* 12px */
   padding-bottom: 0.75rem; /* 12px */
@@ -59,6 +59,18 @@
 
 .navbar-scrolled .navbar-container .navbar-logo {
   color: #1f2937; /* Example: text-gray-800, good for light backgrounds */
+}
+.navbar-scrolled .navbar-link-item a {
+  color: #374151; /* Example: slightly lighter gray */
+}
+
+/* Or if you want a smooth transition */
+.navbar-link-item a {
+  transition: color 0.3s ease;
+}
+
+.navbar-scrolled .navbar-link-item a {
+  color: #1f2937;
 }
 
 

@@ -1,0 +1,222 @@
+/* styles/index.css - Combined styles for index route */
+
+/* Global responsive font loading */
+@import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
+
+/* Base styles with responsive design */
+.page-container {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Header content responsive styling */
+.header-content {
+  text-align: center;
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.main-title {
+  font-family: 'Chewy', cursive;
+  font-size: clamp(2rem, 5vw, 4rem);
+  margin-bottom: 1rem;
+  color: #333;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.subtitle {
+  font-family: 'Chewy', cursive;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Navbar logo responsive */
+.navbar-logo {
+  font-family: 'Chewy', cursive;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: bold;
+}
+
+/* Loading message */
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  color: #666;
+}
+
+/* Portfolio grid - fully responsive */
+.portfolio-grid {
+  width: 100%;
+  min-height: 100vh;
+  background: #ff69b4;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(1rem, 3vw, 3rem);
+  padding: clamp(1rem, 3vw, 3rem);
+  box-sizing: border-box;
+}
+
+/* Portfolio items */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .portfolio-grid {
+    width: 100%;
+    min-height: 100vh;
+    background: #ff69b4;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    gap: clamp(1rem, 3vw, 3rem);
+    padding: clamp(1rem, 3vw, 3rem);
+    box-sizing: border-box;
+  }
+} 
+@media (max-width: 480px) {
+  .portfolio-grid {
+    width: 100%;
+    min-height: 100vh;
+    background: #ff69b4;
+    display: grid;
+    grid-template-columns: repeat(1, minmax(300px, 1fr));
+    gap: clamp(1rem, 3vw, 3rem);
+    padding: clamp(1rem, 3vw, 3rem);
+    box-sizing: border-box;
+  }
+}
+
+
+    
+.portfolio-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.portfolio-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Portfolio labels */
+.portfolio-label {
+  font-family: 'Chewy', cursive;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  pointer-events: none;
+  text-align: center;
+  width: 90%;
+}
+
+/* Responsive breakpoints */
+
+/* Mobile devices (portrait) */
+@media (max-width: 480px) {
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .portfolio-item {
+    min-height: 300px;
+  }
+  
+  .header-content {
+    padding: 1rem 0.5rem;
+  }
+}
+
+/* Tablets (portrait) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  .portfolio-item {
+    min-height: 350px;
+  }
+}
+
+/* Tablets (landscape) and small desktops */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    padding: 2rem;
+  }
+  
+  .portfolio-item {
+    min-height: 400px;
+  }
+}
+
+/* Large desktops */
+@media (min-width: 1025px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 3rem;
+    padding: 3rem;
+  }
+  
+  .portfolio-item {
+    min-height: 500px;
+  }
+}
+
+/* Extra large screens */
+@media (min-width: 1440px) {
+  .portfolio-grid {
+    max-width: 1600px;
+    gap: 4rem;
+    padding: 4rem;
+  }
+  
+  .portfolio-item {
+    min-height: 600px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-item {
+    transition: none;
+  }
+  
+  .portfolio-item:hover {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .main-title,
+  .subtitle {
+    text-shadow: none;
+  }
+  
+  .portfolio-label {
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  }
+}
