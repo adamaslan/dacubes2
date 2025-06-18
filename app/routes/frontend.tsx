@@ -57,7 +57,7 @@ export default function AIProjects() {
             <a href="https://github.com/adamaslan/intartmag" className="project-content-link">
               <div className="threejs-card-content">
                 <h2 className="threejs-card-title">International Art Magazine</h2>
-                <p className="threejs-card-text">This website features a responsive Navbar that turns transparent and begins pink for mobile.</p>
+                <p className="threejs-card-text">This website built with only HTML, CSS, and vanilla Javascript running on Netlify has many responsive features including a sticky navbar that turns transparent as a pink background color for mobile and black for desktop.</p>
                 <p className="threejs-card-subtext">Click to explore the code</p>
               </div>
             </a>
@@ -82,7 +82,7 @@ export default function AIProjects() {
             <a href="https://github.com/yourusername/project2" className="project-content-link">
               <div className="threejs-card-content">
                 <h2 className="threejs-card-title">Tasty Tech Bytes</h2>
-                <p className="threejs-card-text">Fullstack React Remix App running on Netlify featuring a complex grid using Tailwind</p>
+                <p className="threejs-card-text">Fullstack React Remix App running on Netlify featuring a complex grid using Tailwind CSS</p>
                 <p className="threejs-card-subtext">Click to explore the code</p>
               </div>
             </a>
@@ -107,7 +107,7 @@ export default function AIProjects() {
             <a href="https://github.com/adamaslan/dfl/blob/main/src/app/besttacosinbk/page.js" className="project-content-link">
               <div className="threejs-card-content">
                 <h2 className="threejs-card-title">Taco Poll Results Chart</h2>
-                <p className="threejs-card-text">A Vibrant Recharts Graph that utilizes the D3 library to create a responsive graph with hover effects for superior User Experience and Interaction</p>
+                <p className="threejs-card-text">A vibrant Recharts graph that utilizes the D3 library to create a responsive graph with hover effects for superior user experience and interaction</p>
                 <p className="threejs-card-subtext">Click to explore the code</p>
               </div>
             </a>
