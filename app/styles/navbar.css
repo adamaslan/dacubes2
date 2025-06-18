@@ -50,6 +50,7 @@
 
 .navbar-logo:hover {
   transform: scale(1.05);
+  color: purple;
 }
 
 /* Logo color based on navbar state */
@@ -58,10 +59,10 @@
 }
 
 .navbar-scrolled .navbar-container .navbar-logo {
-  color: #1911ff;/* Example: text-gray-800, good for light backgrounds */
+  color:#ff69b4;/* Example: text-gray-800, good for light backgrounds */
 }
 .navbar-scrolled .navbar-link-item a {
-  color: #1911ff;/* Example: slightly lighter gray */
+  color: #ff69b4;/* Example: slightly lighter gray */
 }
 
 /* Or if you want a smooth transition */
@@ -70,7 +71,7 @@
 }
 
 .navbar-scrolled .navbar-link-item a {
-  color: #1911ff;
+  color: #ff69b4;
 }
 
 
@@ -92,8 +93,8 @@
 }
 
 .navbar-link-item a:hover {
-  color: #2563eb; /* hover:text-blue-600 */
-  transform: scale(1.02); /* hover:scale-[1.02] */
+  color: purple; /* hover:text-blue-600 */
+  transform: scale(1.52); /* hover:scale-[1.02] */
 }
 
 .navbar-link-item a:active {
@@ -106,8 +107,9 @@
 
 .navbar-link-item a:focus-visible {
   /* focus-visible:ring-2 focus-visible:ring-blue-500 */
-  outline: 2px solid #3b82f6;
+  outline: 2px solid purple;
   outline-offset: 2px;
+  transform: scale(1.52);
 }
 
 /* Responsive adjustments */
