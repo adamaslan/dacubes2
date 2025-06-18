@@ -2,6 +2,8 @@ import React, { useRef, useMemo, useCallback, useState } from 'react';
 import { Canvas, useFrame, useThree, Props as CanvasProps } from '@react-three/fiber'; // Import CanvasProps
 import { Text, Float, Sparkles, useScroll, Billboard, Html, useTexture, OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
+// Import Oswald font from Google Fonts
+const oswaldFontUrl = 'https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap';
 
 // --- Sphere1 Component (Copied from your prompt) ---
 const Sphere1: React.FC = () => {
@@ -29,7 +31,7 @@ const Sphere1: React.FC = () => {
         position={[0, 0, 1.1]}
         color="hotpink"
         fontSize={0.5}
-        font="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap"    anchorX="center"
+        font={oswaldFontUrl} anchorX="center"
         anchorY="middle"
       >
         Adam Aslan
