@@ -41,7 +41,7 @@ export default function Index() {
         <a href="/frontend">     <div className="portfolio-item">    <span className="portfolio-label">Click here to explore my frontend portfolio</span> </div></a>
         
        
-         
+        <div className="portfolio-item">
             <TextAnimation
               text="Frontend" 
               backgroundEffect="particles"
@@ -49,6 +49,7 @@ export default function Index() {
               primaryColor="pink"
               secondaryColor="#FF69B4"
             />
+            </div>
       
       <a href="/threejs">  <div className="portfolio-item">     <span className="portfolio-label">Click here to explore my ThreeJS and React Three Fiber Portfolio</span> </div></a>
         
