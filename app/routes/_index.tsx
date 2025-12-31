@@ -3,6 +3,7 @@ import React, { Suspense} from "react";
 import Navbar from "~/components/navbar";
 import type {  MetaFunction } from "@remix-run/node";
 import TextAnimation from "../components/TextAnimation";
+import VanillaGridMaze from "../components/VanillaGridMaze";
 // import MovingObject from "../components/genericsphere-stars";
 import "../styles/index.css";
 
@@ -69,6 +70,10 @@ export default function Index() {
       {/* <Suspense fallback={null}>
             <MovingObject />
           </Suspense> */}
+
+      <Suspense fallback={<div className="loading-message">Loading Grid Maze...</div>}>
+        <VanillaGridMaze />
+      </Suspense>
     </div>
   );
 }
