@@ -53,18 +53,34 @@ export default function Index() {
             </div>
       
       <a href="/threejs">  <div className="portfolio-item">     <span className="portfolio-label">Click here to explore my ThreeJS and React Three Fiber Portfolio</span> </div></a>
-        
-       
+
+
           <div className="portfolio-item">
             {/* <span className="portfolio-label">ThreeJS</span> */}
-            <TextAnimation 
-              text="ThreeJS" 
+            <TextAnimation
+              text="ThreeJS"
               backgroundEffect="grid"
               backgroundIntensity={1}
               primaryColor="#00f2f2"
               secondaryColor="#ffffff"
             />
           </div>
+
+      <a href="/ai" aria-label="Explore AI Work portfolio including RAG, knowledge graphs, and MCP integrations">
+        <div className="portfolio-item">
+          <span className="portfolio-label">Click here to explore my AI Work</span>
+        </div>
+      </a>
+
+      <div className="portfolio-item">
+        <TextAnimation
+          text="AI Work"
+          backgroundEffect="neural"
+          backgroundIntensity={1.1}
+          primaryColor="#00ff88"
+          secondaryColor="#9945ff"
+        />
+      </div>
         </div>
       </Suspense>
       {/* <Suspense fallback={null}>
