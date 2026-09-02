@@ -8,7 +8,7 @@ export const meta: MetaFunction = () => {
     {
       name: "description",
       content:
-        "Nine shipped AI systems: a 457-name signal catalog, a self-grading eval harness, a six-seat deliberation council, a physical anti-hallucination gate, and self-healing model infrastructure.",
+        "Nine AI systems (eight shipped, one in progress): a 457-name signal catalog, a self-grading eval harness, a six-seat deliberation council, a physical anti-hallucination gate, and self-healing model infrastructure.",
     },
     { property: "og:title", content: "AI Work Portfolio - Adam Aslan" },
     {
@@ -174,6 +174,7 @@ const STACK_CHIPS = [
   "Modal",
 ];
 
+/** Renders a feature's status as a text label plus color (never color alone). */
 function Badge({ status }: { status: Status }) {
   const isShipped = status === "shipped";
   return (
@@ -185,6 +186,7 @@ function Badge({ status }: { status: Status }) {
   );
 }
 
+/** One feature card: title, hook, "why it's hard", tech line, source link, status badge. */
 function FeatureCard({ f }: { f: AIFeature }) {
   return (
     <article className="ai-card">
@@ -212,6 +214,7 @@ function FeatureCard({ f }: { f: AIFeature }) {
   );
 }
 
+/** A titled `<section>` wrapping one group of feature cards. */
 function Group({ title, features }: { title: string; features: AIFeature[] }) {
   return (
     <section className="ai-group" aria-label={title}>
@@ -225,6 +228,7 @@ function Group({ title, features }: { title: string; features: AIFeature[] }) {
   );
 }
 
+/** The `/ai` route: nine AI feature cards in three groups, plus stack chips and a roadmap note. */
 export default function AIPortfolio() {
   const navLinks = [
     { href: "/", text: "Home" },
@@ -239,7 +243,7 @@ export default function AIPortfolio() {
       <main className="ai-main">
         <header className="ai-header">
           <h1 className="ai-title">AI Work Portfolio</h1>
-          <p className="ai-subtitle">Nine shipped systems — not a roadmap</p>
+          <p className="ai-subtitle">Nine real systems — eight shipped, one in progress. Not a roadmap.</p>
         </header>
 
         <p className="ai-throughline">
