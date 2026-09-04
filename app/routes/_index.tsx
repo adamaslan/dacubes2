@@ -5,7 +5,25 @@ import type {  MetaFunction } from "@remix-run/node";
 import TextAnimation from "../components/TextAnimation";
 import VanillaGridMaze from "../components/VanillaGridMaze";
 // import MovingObject from "../components/genericsphere-stars";
+import { useTheme } from "../hooks/useTheme";
 import "../styles/index.css";
+
+// Posh-mode desaturates the canvases to match the ivory/brass register —
+// see app/hooks/useTheme.ts. Without this the page goes elegant while the
+// 3D scenes stay neon, which is the single most likely way the toggle ships
+// looking broken.
+const SCENE_COLORS = {
+  cyber: {
+    frontend: { primary: "pink", secondary: "#FF69B4" },
+    threejs: { primary: "#00f2f2", secondary: "#ffffff" },
+    ai: { primary: "#00ff88", secondary: "#9945ff" },
+  },
+  posh: {
+    frontend: { primary: "#a68a4b", secondary: "#c9b48a" },
+    threejs: { primary: "#5b7a93", secondary: "#8a9aa8" },
+    ai: { primary: "#5c2a2a", secondary: "#8f5a4a" },
+  },
+} as const;
 
 
 export const meta: MetaFunction = () => {
@@ -21,6 +39,10 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+  const theme = useTheme();
+  const colors = SCENE_COLORS[theme];
+  const backgroundIntensity = theme === "posh" ? 0.6 : 1.2;
+
   return (
     <div className="page-container">
       <Navbar 
@@ -44,14 +66,14 @@ export default function Index() {
        
         <div className="portfolio-item">
             <TextAnimation
-              text="Frontend" 
+              text="Frontend"
               backgroundEffect="particles"
-              backgroundIntensity={1.2}
-              primaryColor="pink"
-              secondaryColor="#FF69B4"
+              backgroundIntensity={backgroundIntensity}
+              primaryColor={colors.frontend.primary}
+              secondaryColor={colors.frontend.secondary}
             />
             </div>
-      
+
       <a href="/threejs">  <div className="portfolio-item">     <span className="portfolio-label">Click here to explore my ThreeJS and React Three Fiber Portfolio</span> </div></a>
 
 
@@ -60,9 +82,9 @@ export default function Index() {
             <TextAnimation
               text="ThreeJS"
               backgroundEffect="grid"
-              backgroundIntensity={1}
-              primaryColor="#00f2f2"
-              secondaryColor="#ffffff"
+              backgroundIntensity={backgroundIntensity}
+              primaryColor={colors.threejs.primary}
+              secondaryColor={colors.threejs.secondary}
             />
           </div>
 
@@ -76,9 +98,9 @@ export default function Index() {
         <TextAnimation
           text="AI Work"
           backgroundEffect="neural"
-          backgroundIntensity={1.1}
-          primaryColor="#00ff88"
-          secondaryColor="#9945ff"
+          backgroundIntensity={backgroundIntensity}
+          primaryColor={colors.ai.primary}
+          secondaryColor={colors.ai.secondary}
         />
       </div>
         </div>
