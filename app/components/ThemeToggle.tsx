@@ -39,13 +39,11 @@ export default function ThemeToggle() {
   // original vivid style).
   const label = theme === "posh" ? "Fun" : "Elegant";
 
+  // No aria-pressed: the label already names the action ("Elegant"/"Fun"),
+  // not a persisted state, so a pressed/unpressed announcement would say the
+  // opposite of what the label reads.
   return (
-    <button
-      type="button"
-      className="theme-toggle"
-      aria-pressed={theme === "posh"}
-      onClick={toggle}
-    >
+    <button type="button" className="theme-toggle" onClick={toggle}>
       <span className="theme-toggle-dot" aria-hidden="true" />
       {label} mode
     </button>
