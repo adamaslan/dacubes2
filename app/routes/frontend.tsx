@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
 import Navbar from "~/components/navbar";
+import { projectsIn } from "~/data/projects";
 import "../styles/frontend.css";
 
 export const meta: MetaFunction = () => {
@@ -10,7 +11,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function AIProjects() {
+export default function FrontendProjects() {
   const navLinks = [
     { href: "/", text: "Home" },
     { href: "/about", text: "About" },
@@ -18,115 +19,37 @@ export default function AIProjects() {
   ];
 
   const logo = <div>Adam Timur Aslan</div>;
+  const projects = projectsIn("frontend");
 
   return (
     <div className="threejs-container">
       <Navbar links={navLinks} logo={logo} />
-      
+
       <main className="threejs-main">
         <h1 className="threejs-title">Frontend Projects</h1>
-        
+
         <div className="threejs-grid" id="parent">
-        
-          <div className="threejs-card threejs-card-purp">
-            <a href="https://github.com/adamaslan/dfl" className="project-content-link">
-              <div className="threejs-card-content">
-                <h2 className="threejs-card-title">Drinks Food Life</h2>
-                <p className="threejs-card-text">Fullstack NextJS React App running on Vercel featuring a complex grid using Tailwind</p>
-                <p className="threejs-card-subtext">Click to explore the code</p>
-              </div>
-            </a>
-            <video 
-              autoPlay 
-              loop 
-              muted
-              controls
-              onClick={(e) => {
-                if (e.currentTarget.requestFullscreen) {
-                  e.currentTarget.requestFullscreen();
-                }
-              }}
-              style={{ cursor: 'pointer' }}
+          {projects.map((project) => (
+            <Link
+              key={project.slug}
+              to={`/frontend/${project.slug}`}
+              className={`threejs-card ${project.cardClass}`}
             >
-              <source src="/dfl1b.mov" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-
-          <div className="threejs-card threejs-card-purp">
-            <a href="https://github.com/adamaslan/intartmag" className="project-content-link">
+              {project.poster && (
+                <img
+                  src={project.poster}
+                  alt=""
+                  loading="lazy"
+                  className="threejs-card-poster"
+                />
+              )}
               <div className="threejs-card-content">
-                <h2 className="threejs-card-title">International Art Magazine</h2>
-                <p className="threejs-card-text">This website built with only HTML, CSS, and vanilla Javascript running on Netlify has many responsive features including a sticky navbar that turns transparent as a pink background color for mobile and black for desktop.</p>
-                <p className="threejs-card-subtext">Click to explore the code</p>
+                <h2 className="threejs-card-title">{project.title}</h2>
+                <p className="threejs-card-text">{project.blurb}</p>
+                <p className="threejs-card-subtext">Read more &rarr;</p>
               </div>
-            </a>
-            <video 
-              autoPlay 
-              loop 
-              muted
-              controls
-              onClick={(e) => {
-                if (e.currentTarget.requestFullscreen) {
-                  e.currentTarget.requestFullscreen();
-                }
-              }}
-              style={{ cursor: 'pointer' }}
-            >
-              <source src="/iam1b.mov" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-
-          <div className="threejs-card threejs-card-purp">
-            <a href="https://github.com/yourusername/project2" className="project-content-link">
-              <div className="threejs-card-content">
-                <h2 className="threejs-card-title">Tasty Tech Bytes</h2>
-                <p className="threejs-card-text">Fullstack React Remix App running on Netlify featuring a complex grid using Tailwind CSS</p>
-                <p className="threejs-card-subtext">Click to explore the code</p>
-              </div>
-            </a>
-            <video 
-              autoPlay 
-              loop 
-              muted
-              controls
-              onClick={(e) => {
-                if (e.currentTarget.requestFullscreen) {
-                  e.currentTarget.requestFullscreen();
-                }
-              }}
-              style={{ cursor: 'pointer' }}
-            >
-              <source src="/ttb2.mov" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-
-          <div className="threejs-card threejs-card-purp">
-            <a href="https://github.com/adamaslan/dfl/blob/main/src/app/besttacosinbk/page.js" className="project-content-link">
-              <div className="threejs-card-content">
-                <h2 className="threejs-card-title">Taco Poll Results Chart</h2>
-                <p className="threejs-card-text">A vibrant Recharts graph that utilizes the D3 library to create a responsive graph with hover effects for superior user experience and interaction</p>
-                <p className="threejs-card-subtext">Click to explore the code</p>
-              </div>
-            </a>
-            <video 
-              autoPlay 
-              loop 
-              muted
-              controls
-              onClick={(e) => {
-                if (e.currentTarget.requestFullscreen) {
-                  e.currentTarget.requestFullscreen();
-                }
-              }}
-              style={{ cursor: 'pointer' }}
-            >
-              <source src="/taco-graph.mov" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
+            </Link>
+          ))}
         </div>
       </main>
     </div>

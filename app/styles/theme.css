@@ -1,0 +1,180 @@
+/* ---------------------------------------------------------------------------
+   Theme tokens.
+
+   Two registers share one set of custom properties:
+     (default)            — the vivid register: saturated blocks, sans, snappy
+     [data-theme="posh"]  — the elegant register: ivory, serif, hairlines, slow
+
+   Rule of thumb: nothing outside this file should branch on the theme. If a
+   component needs an `if (posh)`, the value belongs here as a token instead.
+   --------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Utopia Serif";
+  src: url("/fonts/utopia_serif-webfont.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* type */
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-body);
+  --heading-tracking: -0.01em;
+  --heading-transform: none;
+  --body-leading: 1.5;
+
+  /* surface */
+  --page-bg: #ffffff;
+  --card-bg: #3b82f6;
+  --card-fg: #ffffff;
+  --card-fg-muted: rgba(255, 255, 255, 0.82);
+  --ink: #1f2937;
+  --ink-muted: #4b5563;
+  --rule: rgba(31, 41, 55, 0.14);
+
+  /* shape */
+  --card-radius: 0.5rem;
+  --card-border: none;
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --card-lift: -0.375rem;
+
+  /* motion */
+  --ease: ease;
+  --dur: 0.3s;
+
+  /* accents used by chips, rules and the toggle */
+  --accent: #3b82f6;
+  --accent-contrast: #ffffff;
+
+  /* card color variants — one saturated fill per project card in the
+     default register; posh collapses all of these to the uniform
+     --card-bg surface below and mutes the *-accent color to a thin
+     top-border stripe, so project identity survives without the color
+     block. */
+  --card-purp: #f824ff;
+  --card-purp-accent: #f824ff;
+  --card-blue: #3b82f6;
+  --card-blue-accent: #3b82f6;
+  --card-green: #22c55e;
+  --card-green-accent: #22c55e;
+  --card-purple: #a855f7;
+  --card-purple-accent: #a855f7;
+  --card-red: #ef4444;
+  --card-red-accent: #ef4444;
+}
+
+[data-theme="posh"] {
+  --font-body: "Utopia Serif", Georgia, "Times New Roman", serif;
+  --font-heading: "Utopia Serif", Georgia, "Times New Roman", serif;
+  --heading-tracking: 0.06em;
+  --heading-transform: uppercase;
+  --body-leading: 1.75;
+
+  --page-bg: #faf7f2;
+  --card-bg: #fffdfa;
+  --card-fg: #241f1a;
+  --card-fg-muted: rgba(36, 31, 26, 0.66);
+  --ink: #241f1a;
+  --ink-muted: rgba(36, 31, 26, 0.62);
+  --rule: rgba(36, 31, 26, 0.16);
+
+  --card-radius: 2px;
+  --card-border: 1px solid rgba(36, 31, 26, 0.16);
+  --card-shadow: none;
+  --card-shadow-hover: 0 1px 0 rgba(36, 31, 26, 0.28);
+  --card-lift: -0.125rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 0.55s;
+
+  --accent: #a68a4b;
+  --accent-contrast: #241f1a;
+
+  /* every card variant collapses to the uniform ivory panel; only the
+     accent stripe survives, muted toward the brass/oxblood posh palette
+     so five distinct hues stay distinguishable without staying neon. */
+  --card-purp: var(--card-bg);
+  --card-purp-accent: #8a5a6e;
+  --card-blue: var(--card-bg);
+  --card-blue-accent: #5b7a93;
+  --card-green: var(--card-bg);
+  --card-green-accent: #6b8f6f;
+  --card-purple: var(--card-bg);
+  --card-purple-accent: #7d6a94;
+  --card-red: var(--card-bg);
+  --card-red-accent: #8f5a4a;
+}
+
+body {
+  font-family: var(--font-body);
+  line-height: var(--body-leading);
+}
+
+/* Only colour and shadow transition. Never `all` — it makes the WebGL
+   canvases thrash on every theme flip. */
+body,
+.threejs-container,
+.threejs-card,
+.threejs-card-title,
+.threejs-card-text {
+  transition:
+    background-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ------------------------------ the toggle ------------------------------ */
+
+.theme-toggle {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.theme-toggle-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+[data-theme="posh"] .theme-toggle {
+  background: rgba(255, 253, 250, 0.95);
+  border-radius: 2px;
+}

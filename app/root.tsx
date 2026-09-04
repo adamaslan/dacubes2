@@ -6,18 +6,24 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import "./styles/global.css";
-// import type { LinksFunction } from "@remix-run/node";
+import "./styles/theme.css";
+import ThemeToggle from "~/components/ThemeToggle";
 
-// Don't import CSS files with 'import ... from' syntax
-// import globalStylesHref from "./styles/global.css"; // This is wrong
-
-// CSS files should be referenced in the links function
-// export const links: LinksFunction = () => [
-//   { rel: "stylesheet", href: "/styles/global.css" },
-//   // You might also want to link fonts here if not done in global.css
-//   // e.g., { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" }
-//   // from your contact.css
-// ];
+// Stamp data-theme on <html> before first paint so there is no
+// flash-of-wrong-theme: SSR always renders the default (vivid) register,
+// and this blocking script corrects it from localStorage pre-hydration.
+const noFlashThemeScript = `
+(function () {
+  try {
+    var stored = window.localStorage.getItem("portfolio-theme");
+    if (stored === "posh") {
+      document.documentElement.setAttribute("data-theme", "posh");
+    }
+  } catch (e) {
+    /* localStorage unavailable (private mode, etc.) — default register stands */
+  }
+})();
+`;
 
 export default function App() {
   return (
@@ -27,9 +33,11 @@ export default function App() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} />
       </head>
       <body>
         <Outlet />
+        <ThemeToggle />
         <ScrollRestoration />
         <Scripts />
       </body>
