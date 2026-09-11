@@ -19,9 +19,9 @@
 }
 
 .navbar-scrolled {
-  background-color: rgba(255, 255, 255, 0.8); /* bg-white/80 */
+  background-color: var(--overlay-bg);
   backdrop-filter: blur(16px); /* backdrop-blur-md */
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* shadow-sm */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
 }
 
 .navbar-transparent {
@@ -44,34 +44,23 @@
   transition-duration: 150ms; /* Tailwind default transition */
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 700; /* font-bold (applied to passed logo text) */
-  font-family: 'Chewy', cursive; /* Added Permanent Marker font */
+  font-family: var(--font-heading);
   /* Color will be set based on parent .navbar-transparent or .navbar-scrolled */
 }
 
 .navbar-logo:hover {
   transform: scale(1.05);
-  color: purple;
+  color: var(--nav-link-hover);
 }
 
 /* Logo color based on navbar state */
-.navbar-transparent .navbar-container .navbar-logo {
-  color: rgb(0, 0, 0);
-}
-
+.navbar-transparent .navbar-container .navbar-logo,
 .navbar-scrolled .navbar-container .navbar-logo {
-  color:#ff69b4;/* Example: text-gray-800, good for light backgrounds */
-}
-.navbar-scrolled .navbar-link-item a {
-  color: #ff69b4;/* Example: slightly lighter gray */
-}
-
-/* Or if you want a smooth transition */
-.navbar-link-item a {
-  transition: color 0.3s ease;
+  color: var(--nav-link);
 }
 
 .navbar-scrolled .navbar-link-item a {
-  color: #ff69b4;
+  color: var(--nav-link);
 }
 
 
@@ -81,19 +70,19 @@
 }
 
 .navbar-link-item a {
-  color: #000000; /* text-gray-700 */
+  color: var(--nav-link);
   font-weight: 500; /* font-medium */
-  transition-property: all; /* transition-all */
+  transition-property: color, transform;
   transition-duration: 300ms; /* duration-300 */
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); /* default ease */
   padding: 0.25rem 0.5rem; /* px-2 py-1 (4px 8px) */
   border-radius: 0.5rem; /* rounded-lg (8px) */
   text-decoration: none;
-  font-family: 'Chewy', cursive; /* Added Permanent Marker font */
+  font-family: var(--font-heading);
 }
 
 .navbar-link-item a:hover {
-  color: purple; /* hover:text-blue-600 */
+  color: var(--nav-link-hover);
   transform: scale(1.52); /* hover:scale-[1.02] */
 }
 
@@ -106,8 +95,7 @@
 }
 
 .navbar-link-item a:focus-visible {
-  /* focus-visible:ring-2 focus-visible:ring-blue-500 */
-  outline: 2px solid purple;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   transform: scale(1.52);
 }

@@ -110,7 +110,7 @@ export default function Index() {
           </Suspense> */}
 
       <Suspense fallback={<div className="loading-message">Loading Grid Maze...</div>}>
-        <VanillaGridMaze />
+        <VanillaGridMaze theme={theme} />
       </Suspense>
     </div>
   );

@@ -1,9 +1,68 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import type { ThemeName } from '../hooks/useTheme';
 
 type VanillaGridMazeProps = {
   onComplete?: () => void;
+  theme?: ThemeName;
 };
+
+// WebGL can't read CSS custom properties, so the maze carries its own copy of
+// the two registers. "cyber" (Fun) keeps the neon-on-charcoal look; "posh"
+// (Elegant) desaturates to the ivory/brass register so the canvas doesn't stay
+// neon while the page around it goes elegant.
+const MAZE_PALETTE = {
+  cyber: {
+    clear: 0x0a0a0f,
+    fog: 0x0a0a0f,
+    ambient: 0x404040,
+    dir: 0xffffff,
+    point1: 0x00ffaa,
+    point2: 0x00f2f2,
+    floor: 0x14141c,
+    wall: 0x2a2a3a,
+    wallTop: 0x00ffaa,
+    goal: 0x00ffaa,
+    arrow: 0xffe066,
+    label: 0x00ff88,
+    ball: 0x00f2f2,
+    trail: 0x00f2f2,
+    text: '#e8e8f0',
+    textAccent: '#00ffaa',
+    winGlow: 'rgba(0,255,170,0.28)',
+    celebrate: [0x00ffaa, 0x00f2f2, 0xffe066, 0x00ff88, 0xe879f9],
+    joyBase: 'rgba(255, 255, 255, 0.12)',
+    joyBorder: 'rgba(0, 255, 170, 0.4)',
+    joyKnob: 'linear-gradient(135deg, #00f2f2, #00ffaa)',
+    joyKnobShadow: '0 4px 15px rgba(0, 255, 170, 0.35)',
+    arrowUi: 'rgba(232, 232, 240, 0.55)',
+  },
+  posh: {
+    clear: 0xf1ece2,
+    fog: 0xf1ece2,
+    ambient: 0x8a8177,
+    dir: 0xfff8ec,
+    point1: 0xa68a4b,
+    point2: 0x8a5a4a,
+    floor: 0xe7e0d3,
+    wall: 0xcfc6b6,
+    wallTop: 0xa68a4b,
+    goal: 0x5c2a2a,
+    arrow: 0xa68a4b,
+    label: 0x6b8f6f,
+    ball: 0xa68a4b,
+    trail: 0xc9b48a,
+    text: '#241f1a',
+    textAccent: '#5c2a2a',
+    winGlow: 'rgba(166,138,75,0.22)',
+    celebrate: [0xa68a4b, 0xc9b48a, 0x8f5a4a, 0x6b8f6f, 0x7d6a94],
+    joyBase: 'rgba(36, 31, 26, 0.08)',
+    joyBorder: 'rgba(36, 31, 26, 0.24)',
+    joyKnob: 'linear-gradient(135deg, #a68a4b, #8f5a4a)',
+    joyKnobShadow: '0 4px 15px rgba(36, 31, 26, 0.2)',
+    arrowUi: 'rgba(36, 31, 26, 0.45)',
+  },
+} as const;
 
 // Maze layout: 1 = wall, 0 = path, 2 = start, 3 = end
 const MAZE_LAYOUT = [
@@ -24,7 +83,8 @@ const MAZE_LAYOUT = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
-const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
+const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete, theme = 'cyber' }) => {
+  const palette = MAZE_PALETTE[theme];
   const mountRef = useRef<HTMLDivElement>(null);
   const keysPressed = useRef<Set<string>>(new Set());
   const joystickRef = useRef<HTMLDivElement>(null);
@@ -39,17 +99,20 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
+    // Elegant keeps emissive low so glowing objects read as lit, not neon.
+    const emissiveBase = theme === 'posh' ? 0.14 : 0.5;
+
     // Initialize renderer with shadows
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.setClearColor(0x1a1a2e);
+    renderer.setClearColor(palette.clear);
     container.appendChild(renderer.domElement);
 
     // Initialize scene
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x1a1a2e, 10, 50);
+    scene.fog = new THREE.Fog(palette.fog, 10, 50);
 
     // Initialize camera - isometric-style view
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
@@ -57,10 +120,10 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     camera.lookAt(7.5, 0, 7.5);
 
     // Lighting for 3D effect
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+    const ambientLight = new THREE.AmbientLight(palette.ambient, theme === 'posh' ? 0.85 : 0.5);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(palette.dir, 1);
     directionalLight.position.set(10, 20, 10);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 2048;
@@ -74,18 +137,18 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     scene.add(directionalLight);
 
     // Add point lights for atmosphere
-    const pointLight1 = new THREE.PointLight(0xff69b4, 0.5, 20);
+    const pointLight1 = new THREE.PointLight(palette.point1, 0.5, 20);
     pointLight1.position.set(3, 5, 3);
     scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight(0x00f2f2, 0.5, 20);
+    const pointLight2 = new THREE.PointLight(palette.point2, 0.5, 20);
     pointLight2.position.set(12, 5, 12);
     scene.add(pointLight2);
 
     // Floor
     const floorGeometry = new THREE.PlaneGeometry(15, 15);
     const floorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x2d2d44,
+      color: palette.floor,
       roughness: 0.8,
       metalness: 0.2
     });
@@ -97,7 +160,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
 
     // Wall material with gradient effect
     const wallMaterial = new THREE.MeshStandardMaterial({
-      color: 0x4a4a6a,
+      color: palette.wall,
       roughness: 0.5,
       metalness: 0.3,
     });
@@ -134,7 +197,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
           // Add top accent
           const topGeometry = new THREE.BoxGeometry(1.05, 0.1, 1.05);
           const topMaterial = new THREE.MeshStandardMaterial({
-            color: 0x6a6a8a,
+            color: palette.wallTop,
             roughness: 0.3,
             metalness: 0.5,
           });
@@ -154,9 +217,9 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     // Create goal (glowing portal to frontend)
     const goalGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32);
     const goalMaterial = new THREE.MeshStandardMaterial({
-      color: 0xff69b4,
-      emissive: 0xff69b4,
-      emissiveIntensity: 0.5,
+      color: palette.goal,
+      emissive: palette.goal,
+      emissiveIntensity: emissiveBase,
     });
     const goal = new THREE.Mesh(goalGeometry, goalMaterial);
     goal.position.set(endX, 0.05, endZ);
@@ -165,9 +228,9 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     // Goal glow ring
     const ringGeometry = new THREE.TorusGeometry(0.5, 0.05, 16, 32);
     const ringMaterial = new THREE.MeshStandardMaterial({
-      color: 0xff69b4,
-      emissive: 0xff69b4,
-      emissiveIntensity: 1,
+      color: palette.goal,
+      emissive: palette.goal,
+      emissiveIntensity: emissiveBase * 2,
     });
     const ring = new THREE.Mesh(ringGeometry, ringMaterial);
     ring.position.set(endX, 0.3, endZ);
@@ -177,9 +240,9 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     // Goal arrow pointing up
     const arrowGeometry = new THREE.ConeGeometry(0.2, 0.5, 8);
     const arrowMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffff00,
-      emissive: 0xffff00,
-      emissiveIntensity: 0.5,
+      color: palette.arrow,
+      emissive: palette.arrow,
+      emissiveIntensity: emissiveBase,
     });
     const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
     arrow.position.set(endX, 1.0, endZ);
@@ -188,9 +251,9 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     // "FRONTEND" text indicator (simple box for now)
     const labelGeometry = new THREE.BoxGeometry(1.5, 0.3, 0.1);
     const labelMaterial = new THREE.MeshStandardMaterial({
-      color: 0x00ff00,
-      emissive: 0x00ff00,
-      emissiveIntensity: 0.3,
+      color: palette.label,
+      emissive: palette.label,
+      emissiveIntensity: emissiveBase * 0.6,
     });
     const label = new THREE.Mesh(labelGeometry, labelMaterial);
     label.position.set(endX, 1.5, endZ);
@@ -200,11 +263,11 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     const ballRadius = 0.3;
     const ballGeometry = new THREE.SphereGeometry(ballRadius, 32, 32);
     const ballMaterial = new THREE.MeshStandardMaterial({
-      color: 0x00f2f2,
+      color: palette.ball,
       roughness: 0.2,
       metalness: 0.8,
-      emissive: 0x00f2f2,
-      emissiveIntensity: 0.2,
+      emissive: palette.ball,
+      emissiveIntensity: emissiveBase * 0.4,
     });
     const ball = new THREE.Mesh(ballGeometry, ballMaterial);
     ball.position.set(startX, ballRadius, startZ);
@@ -214,11 +277,11 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
     // Ball trail effect
     const trailGeometry = new THREE.SphereGeometry(0.15, 16, 16);
     const trailMaterial = new THREE.MeshStandardMaterial({
-      color: 0x00f2f2,
+      color: palette.trail,
       transparent: true,
       opacity: 0.5,
-      emissive: 0x00f2f2,
-      emissiveIntensity: 0.3,
+      emissive: palette.trail,
+      emissiveIntensity: emissiveBase * 0.6,
     });
     const trailParticles: THREE.Mesh[] = [];
     for (let i = 0; i < 5; i++) {
@@ -316,7 +379,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
 
         // Spawn celebration particles
         if (Math.random() < 0.3) {
-          const colors = [0xff69b4, 0x00f2f2, 0xffff00, 0x00ff00, 0xff00ff];
+          const colors = palette.celebrate;
           const particleMat = new THREE.MeshStandardMaterial({
             color: colors[Math.floor(Math.random() * colors.length)],
             emissive: colors[Math.floor(Math.random() * colors.length)],
@@ -434,7 +497,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
       ring.rotation.z = time * 0.002;
       arrow.position.y = 1.0 + Math.sin(time * 0.003) * 0.2;
       arrow.rotation.y = time * 0.002;
-      goalMaterial.emissiveIntensity = 0.3 + Math.sin(time * 0.005) * 0.2;
+      goalMaterial.emissiveIntensity = emissiveBase * 0.6 + Math.sin(time * 0.005) * emissiveBase * 0.4;
 
       // Camera follows ball slightly
       const targetX = 7.5 + (ball.position.x - 7.5) * 0.3;
@@ -477,7 +540,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
         }
       });
     };
-  }, [onComplete]);
+  }, [onComplete, theme, palette]);
 
   // Joystick touch handlers
   const handleJoystickStart = (e: React.TouchEvent | React.MouseEvent) => {
@@ -562,25 +625,23 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'radial-gradient(circle, rgba(255,105,180,0.3) 0%, rgba(0,0,0,0.7) 100%)',
+          background: `radial-gradient(circle, ${palette.winGlow} 0%, rgba(0,0,0,0.7) 100%)`,
           zIndex: 100,
           animation: 'fadeIn 0.5s ease-out',
         }}>
           <div style={{
-            color: 'white',
-            fontFamily: 'Chewy, cursive',
+            color: palette.text,
+            fontFamily: 'var(--font-heading)',
             fontSize: 'clamp(3rem, 10vw, 6rem)',
-            textShadow: '0 0 20px #ff69b4, 0 0 40px #ff69b4, 0 0 60px #00f2f2',
             animation: 'pulse 0.5s ease-in-out infinite alternate',
           }}>
             YOU WIN!
           </div>
           <div style={{
-            color: '#00f2f2',
-            fontFamily: 'Chewy, cursive',
+            color: palette.textAccent,
+            fontFamily: 'var(--font-heading)',
             fontSize: 'clamp(1rem, 3vw, 1.5rem)',
             marginTop: '20px',
-            textShadow: '0 0 10px #00f2f2',
           }}>
             Entering Frontend Portfolio...
           </div>
@@ -593,11 +654,10 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
         top: '20px',
         left: '50%',
         transform: 'translateX(-50%)',
-        color: 'white',
-        fontFamily: 'Chewy, cursive',
+        color: palette.text,
+        fontFamily: 'var(--font-heading)',
         fontSize: 'clamp(1rem, 3vw, 1.5rem)',
         textAlign: 'center',
-        textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
         pointerEvents: 'none',
         zIndex: 10,
         opacity: showWin ? 0 : 1,
@@ -634,8 +694,8 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
           width: '120px',
           height: '120px',
           borderRadius: '50%',
-          background: 'rgba(255, 255, 255, 0.15)',
-          border: '3px solid rgba(255, 255, 255, 0.3)',
+          background: palette.joyBase,
+          border: `3px solid ${palette.joyBorder}`,
           display: showWin ? 'none' : 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -650,8 +710,8 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
             width: '50px',
             height: '50px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #00f2f2, #ff69b4)',
-            boxShadow: '0 4px 15px rgba(0, 242, 242, 0.4)',
+            background: palette.joyKnob,
+            boxShadow: palette.joyKnobShadow,
             transition: 'transform 0.05s ease-out',
           }}
         />
@@ -665,7 +725,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
             bottom: '165px',
             left: '50%',
             transform: 'translateX(-50%)',
-            color: 'rgba(255,255,255,0.5)',
+            color: palette.arrowUi,
             fontSize: '20px',
             pointerEvents: 'none',
             zIndex: 15,
@@ -675,7 +735,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
             bottom: '25px',
             left: '50%',
             transform: 'translateX(-50%)',
-            color: 'rgba(255,255,255,0.5)',
+            color: palette.arrowUi,
             fontSize: '20px',
             pointerEvents: 'none',
             zIndex: 15,
@@ -684,7 +744,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
             position: 'absolute',
             bottom: '90px',
             left: 'calc(50% - 75px)',
-            color: 'rgba(255,255,255,0.5)',
+            color: palette.arrowUi,
             fontSize: '20px',
             pointerEvents: 'none',
             zIndex: 15,
@@ -693,7 +753,7 @@ const VanillaGridMaze: React.FC<VanillaGridMazeProps> = ({ onComplete }) => {
             position: 'absolute',
             bottom: '90px',
             left: 'calc(50% + 60px)',
-            color: 'rgba(255,255,255,0.5)',
+            color: palette.arrowUi,
             fontSize: '20px',
             pointerEvents: 'none',
             zIndex: 15,
