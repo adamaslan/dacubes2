@@ -6,15 +6,28 @@
 body {
   background-color: var(--page-bg);
   color: var(--ink);
+  /* Moved off .page-container so it no longer establishes a containing block
+     for the position: fixed ParallaxBackground layers (which must track the
+     viewport, not the scrolled page). */
+  overflow-x: hidden;
 }
 
 /* Base styles with responsive design */
 .page-container {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  /* Own stacking context: the ParallaxBackground (z-index: 0) sits below,
+     every real child (header, grid, maze, navbar) sits at z-index: 1+. */
+  isolation: isolate;
   background-color: var(--page-bg);
   color: var(--ink);
+}
+
+/* Keep page content above the parallax layer. */
+.header-content,
+.portfolio-grid {
+  position: relative;
+  z-index: 1;
 }
 
 /* Header content responsive styling */
@@ -92,6 +105,31 @@ body {
 .portfolio-item:hover {
   transform: translateY(var(--card-lift));
   box-shadow: var(--card-shadow-hover);
+}
+
+/* Two-tone hover (Fun only): odd tiles keep the mint --accent glow from
+   --card-shadow-hover above; even tiles glow with the magenta counter-accent,
+   so --accent-2 shows up as an accent without taking over the palette. */
+html:not([data-theme="posh"]) .portfolio-item:nth-child(even):hover {
+  box-shadow:
+    0 0 20px -3px color-mix(in srgb, var(--accent-2) 42%, transparent),
+    0 12px 34px -12px rgba(0, 0, 0, 0.8);
+}
+
+/* Faint scanline texture over the tiles in Fun mode — cyberpunk grain at a
+   few percent, static (no animation, so no reduced-motion gate needed),
+   sitting under the label (z-index: 10) and over the tile's canvas. */
+html:not([data-theme="posh"]) .portfolio-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--accent) 4%, transparent) 0 1px,
+    transparent 1px 3px
+  );
 }
 
 a:focus-visible .portfolio-item {
