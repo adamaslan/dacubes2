@@ -39,9 +39,12 @@
   --heading-transform: uppercase;
   --body-leading: 1.6;
 
-  /* surface — dark cyberpunk, contrast-checked against --page-bg */
-  --page-bg: #0a0a0f;
-  --card-bg: #14141c;
+  /* surface — dark cyberpunk, contrast-checked against --page-bg.
+     Faintly cool-purple rather than pure black-and-white: --ink (#e8e8f0)
+     still clears ~15:1 on both, so the greys read as "dark cyberpunk"
+     instead of neutral charcoal. */
+  --page-bg: #0a0910;
+  --card-bg: #141220;
   --card-fg: #e8e8f0; /* ~15:1 on --card-bg */
   --card-fg-muted: rgba(232, 232, 240, 0.68); /* ~9:1 */
   --ink: #e8e8f0; /* ~15:1 on --page-bg */
@@ -66,6 +69,13 @@
      numerically but shimmers at paragraph size. */
   --accent: #00ffaa;
   --accent-contrast: #05140f; /* dark ink for text ON an --accent fill */
+
+  /* counter-accent — the second half of the classic cyberpunk two-tone
+     (mint <-> magenta). Same rules as --accent: borders, glows, focus on
+     alternate elements, one hover state, gradient stops. Never body text —
+     #ff4fd8 on #0a0910 is ~6.8:1, fine for large text / UI, not paragraphs. */
+  --accent-2: #ff4fd8;
+  --accent-2-contrast: #1a0716; /* dark ink for text ON an --accent-2 fill */
 
   /* chrome that overlays the page (toggle, scrolled navbar) */
   --overlay-bg: rgba(20, 20, 28, 0.92);
@@ -115,6 +125,11 @@
 
   --accent: #a68a4b;
   --accent-contrast: #241f1a;
+
+  /* posh counter-accent: a muted dusty-plum so nothing outside this file
+     has to branch on the theme when it reaches for --accent-2. */
+  --accent-2: #8a5a6e;
+  --accent-2-contrast: #fffdfa;
 
   --overlay-bg: rgba(255, 253, 250, 0.95);
   --nav-link: #241f1a;

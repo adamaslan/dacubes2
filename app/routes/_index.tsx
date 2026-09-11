@@ -4,6 +4,7 @@ import Navbar from "~/components/navbar";
 import type {  MetaFunction } from "@remix-run/node";
 import TextAnimation from "../components/TextAnimation";
 import VanillaGridMaze from "../components/VanillaGridMaze";
+import ParallaxBackground from "../components/ParallaxBackground";
 // import MovingObject from "../components/genericsphere-stars";
 import { useTheme } from "../hooks/useTheme";
 import "../styles/index.css";
@@ -12,11 +13,14 @@ import "../styles/index.css";
 // see app/hooks/useTheme.ts. Without this the page goes elegant while the
 // 3D scenes stay neon, which is the single most likely way the toggle ships
 // looking broken.
+// Fun-mode secondaries are all --accent-2 (#ff4fd8) so the landing tiles pick
+// up the magenta counter-accent — the per-scene identity still lives in the
+// distinct primary hue. Keep these in sync with --accent-2 in theme.css.
 const SCENE_COLORS = {
   cyber: {
-    frontend: { primary: "pink", secondary: "#FF69B4" },
-    threejs: { primary: "#00f2f2", secondary: "#ffffff" },
-    ai: { primary: "#00ff88", secondary: "#9945ff" },
+    frontend: { primary: "pink", secondary: "#ff4fd8" },
+    threejs: { primary: "#00f2f2", secondary: "#ff4fd8" },
+    ai: { primary: "#00ff88", secondary: "#ff4fd8" },
   },
   posh: {
     frontend: { primary: "#a68a4b", secondary: "#c9b48a" },
@@ -45,7 +49,8 @@ export default function Index() {
 
   return (
     <div className="page-container">
-      <Navbar 
+      <ParallaxBackground />
+      <Navbar
         links={[
           { href: "/", text: "Home" },
           { href: "/about", text: "About" },

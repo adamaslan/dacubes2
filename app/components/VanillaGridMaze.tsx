@@ -13,20 +13,25 @@ type VanillaGridMazeProps = {
 // neon while the page around it goes elegant.
 const MAZE_PALETTE = {
   cyber: {
-    clear: 0x0a0a0f,
-    fog: 0x0a0a0f,
+    // Surface hexes mirror --page-bg / --card-bg in theme.css (faintly
+    // cool-purple, not pure charcoal) so the maze section doesn't seam
+    // against the CSS page above it.
+    clear: 0x0a0910,
+    fog: 0x0a0910,
     ambient: 0x404040,
     dir: 0xffffff,
     point1: 0x00ffaa,
     point2: 0x00f2f2,
-    floor: 0x14141c,
+    floor: 0x141220,
     wall: 0x2a2a3a,
     wallTop: 0x00ffaa,
     goal: 0x00ffaa,
     arrow: 0xffe066,
     label: 0x00ff88,
     ball: 0x00f2f2,
-    trail: 0x00f2f2,
+    // Counter-accent (matches --accent-2): the trail is the one maze element
+    // that carries the magenta, so the ball reads cyan with a magenta wake.
+    trail: 0xff4fd8,
     text: '#e8e8f0',
     textAccent: '#00ffaa',
     winGlow: 'rgba(0,255,170,0.28)',
