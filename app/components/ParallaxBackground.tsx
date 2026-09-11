@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../hooks/useTheme";
 
 /**
@@ -20,13 +20,23 @@ import { useTheme } from "../hooks/useTheme";
  */
 export default function ParallaxBackground() {
   const theme = useTheme();
-  const isPosh = theme === "posh";
+
+  // useTheme()'s lazy initializer reads document.documentElement on the first
+  // client render, so on a saved-Posh load it returns "posh" while the SSR
+  // markup was built as "cyber". Gate the theme branch behind a mount flag so
+  // the first client render matches the server (the 3-layer Fun markup), then
+  // switch to the real register after mount — no hydration subtree swap.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  const isPosh = hydrated && theme === "posh";
 
   const farRef = useRef<HTMLDivElement>(null);
   const midRef = useRef<HTMLDivElement>(null);
   const nearRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (isPosh) return; // Posh renders one static layer — nothing to animate
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reduce.matches) return; // static — no loop, no listeners
 
@@ -44,21 +54,29 @@ export default function ParallaxBackground() {
     let raf = 0;
     let running = true;
 
+    /** One rAF tick: lerp the pointer, then write each layer's transform. */
     const frame = () => {
       if (!running) return;
       const scrollY = window.scrollY || window.pageYOffset || 0;
       pointerNow.x += (pointerTarget.x - pointerNow.x) * 0.06;
       pointerNow.y += (pointerTarget.y - pointerNow.y) * 0.06;
 
+      // Each layer bleeds 15% past the viewport; keep the combined scroll +
+      // pointer travel inside that bleed so no layer edge scrolls into view
+      // on a long page.
+      const maxTy = window.innerHeight * 0.15;
+
       for (const [el, scrollFactor, travel] of layers) {
         if (!el) continue;
         const tx = pointerNow.x * travel;
-        const ty = -scrollY * scrollFactor + pointerNow.y * travel;
+        const rawTy = -scrollY * scrollFactor + pointerNow.y * travel;
+        const ty = Math.max(-maxTy, Math.min(maxTy, rawTy));
         el.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
       }
       raf = requestAnimationFrame(frame);
     };
 
+    /** Store the latest pointer position as a -1..1 offset from viewport centre. */
     const onPointerMove = (e: PointerEvent) => {
       pointerTarget.x = (e.clientX / window.innerWidth) * 2 - 1;
       pointerTarget.y = (e.clientY / window.innerHeight) * 2 - 1;
@@ -74,7 +92,7 @@ export default function ParallaxBackground() {
       cancelAnimationFrame(raf);
       if (wantsPointer) window.removeEventListener("pointermove", onPointerMove);
     };
-  }, [theme]);
+  }, [isPosh]);
 
   const container: React.CSSProperties = {
     position: "fixed",
