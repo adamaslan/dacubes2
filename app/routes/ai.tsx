@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import type { MetaFunction } from "@remix-run/node";
 import Navbar from "~/components/navbar";
+import { SchedulerDiagram, SeamDiagram, VerbatimGateDiagram } from "~/components/ai-diagrams";
 import "../styles/ai.css";
 
 export const meta: MetaFunction = () => {
@@ -36,6 +38,7 @@ interface AIFeature {
   status: Status;
   url: string;
   url_label: string;
+  visual?: ReactNode;
 }
 
 const FINANCIAL: AIFeature[] = [
@@ -101,6 +104,7 @@ const MULTI_AGENT: AIFeature[] = [
     status: "shipped",
     url: "https://github.com/adamaslan/nuwrrrld-portal/pull/36",
     url_label: "PRs #35 → #36 → #37",
+    visual: <VerbatimGateDiagram />,
   },
   {
     project_id: "ai-text-opt",
@@ -128,6 +132,7 @@ const INFRA: AIFeature[] = [
     status: "shipped",
     url: "https://github.com/adamaslan/nuwrrrld-portal/pull/75",
     url_label: "scripts/refresh-free-models.mjs (PR #75)",
+    visual: <SchedulerDiagram />,
   },
   {
     project_id: "signals-platform",
@@ -140,6 +145,7 @@ const INFRA: AIFeature[] = [
     status: "in progress",
     url: "https://github.com/adamaslan/homebase/blob/main/docs/signals-app-docs/signals-as-api-cli-mcp.md",
     url_label: "design doc (unshipped)",
+    visual: <SeamDiagram />,
   },
   {
     project_id: "ulysses-graph",
@@ -194,6 +200,7 @@ function FeatureCard({ f }: { f: AIFeature }) {
         <h3 className="ai-card-title">{f.name}</h3>
         <Badge status={f.status} />
       </div>
+      {f.visual ? <figure className="ai-card-visual">{f.visual}</figure> : null}
       <p className="ai-card-hook">{f.hook}</p>
       <p className="ai-card-why">
         <strong>Why it&apos;s hard: </strong>
