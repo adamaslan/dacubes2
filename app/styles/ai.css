@@ -216,3 +216,67 @@
     animation: none !important;
   }
 }
+
+/* Inline-SVG diagrams on feature cards */
+.ai-card-visual {
+  margin: 0 0 0.75rem;
+}
+
+.ai-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ai-diagram-node {
+  fill: #0a0f14;
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 1.25;
+}
+
+.ai-diagram-node--gate {
+  stroke: #00ff88;
+  stroke-width: 2;
+}
+
+.ai-diagram-node--drop {
+  stroke: #ff6b6b;
+  stroke-dasharray: 4 3;
+}
+
+.ai-diagram-node--hub {
+  stroke: #9945ff;
+  stroke-width: 2;
+}
+
+.ai-diagram-text {
+  fill: #e8ecf1;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.ai-diagram-note,
+.ai-diagram-caption {
+  fill: rgba(232, 236, 241, 0.75);
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.ai-diagram-caption {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ai-diagram-arrow {
+  fill: none;
+  stroke: rgba(232, 236, 241, 0.6);
+  stroke-width: 1.5;
+}
+
+.ai-diagram-arrow--dashed {
+  stroke-dasharray: 4 3;
+}
+
+.ai-diagram-arrowhead {
+  fill: rgba(232, 236, 241, 0.6);
+}
